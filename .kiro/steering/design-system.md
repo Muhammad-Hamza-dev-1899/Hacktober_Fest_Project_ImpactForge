@@ -3,14 +3,16 @@ inclusion: fileMatch
 fileMatchPattern: "src/components/**/*.tsx"
 ---
 
-# Design system
+# Design system (Apple design language)
 
-- Brand "Forge": molten ember (gold `#ffc061` → orange `#ff6a3d` → magenta `#ff3d77`) on warm black `#09080b`, with film grain and ember particles.
-- Surfaces use `.card` (subtle top-lit gradient + hairline border). Avoid flat gray boxes.
-- Fonts: Geist (tight tracking, `tracking-[-0.04em]` on display sizes), Geist Mono for eyebrows/labels (`.eyebrow`), and Instrument Serif italic (`.serif`) for the emotional accent words in headlines.
-- Never use `mix-blend-mode` on fixed full-screen layers (causes repaint artifacts).
-- Theme colors come only from CSS variables set by `themeVars(palette)`: `--c1 --c2 --c3 --accent --accent-text --glow`.
-- Chart data colors use `SERIES` (fixed, colorblind-validated order), always paired with text labels.
-- Each page gets exactly one "hero moment" animation. Other motion is subtle: opacity plus at most 16px of translate, ease `[0.16, 1, 0.3, 1]`.
-- Gradient text on animated words: apply `.text-gradient` per word (`<BlurText gradient />`). `background-clip: text` doesn't reach transformed children.
-- Mobile first: check at 375px, keep tap targets ≥ 44px, and add a sticky bottom CTA on long pages.
+- Light canvas `#ffffff`, tiles `#f5f5f7`, ink `#1d1d1f`, secondary `#6e6e73` (5.0:1, OK for small text). Never `#86868b` for text under 18px.
+- Use the semantic tokens only (`bg-canvas`, `bg-mist`, `bg-raised`, `text-ink`, `text-ink-2`, `border-line`, `bg-blue`, `text-link`). They resolve per appearance; dark mode follows the system, with no toggle.
+- Type: system SF stack (Inter fallback). Scale utilities: `.t-hero`, `.t-headline`, `.t-title`, `.t-eyebrow`, `.t-lede`. Body 17px; nothing under 11px.
+- Primary action: `.btn-primary` (Apple blue pill). Secondary: `.btn-secondary` or a `.link` with a trailing ›.
+- Blur/frosted material only on floating chrome (global nav, local nav, bottom bars, sheets), never on content. `prefers-reduced-transparency` makes it opaque.
+- Signature: the Intelligence glow (`.intel-ring`, `.text-intel`) is reserved for AI moments (the prompt, generation). Spend it nowhere else.
+- Campaign identity lives in the content layer: cover art and the title's tail gradient (`.text-gradient`, deep tones on light, lighter steps on dark).
+- Charts use `SERIES_VAR` (`var(--s1..s5)`) and always carry text labels.
+- Sheets (`components/billing/Sheet.tsx`): one task, grabber on phones, Escape/backdrop/close button, drag to dismiss.
+- Touch targets ≥ 44px on mobile. Icon-only buttons need `aria-label`.
+- Never draw an Apple Pay button or mark.

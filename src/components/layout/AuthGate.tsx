@@ -1,12 +1,11 @@
 "use client";
 
 import { motion } from "motion/react";
-import { LogoMark } from "@/components/layout/Navbar";
 import { useState, type ReactNode } from "react";
-import { ShimmerButton } from "@/components/ui/primitives";
+import { LogoMark } from "@/components/layout/Navbar";
 import { useAppStore } from "@/store/useAppStore";
 
-/** MOCK auth: a one-click guest login stands in for real authentication. */
+/** MOCK auth: a one-click guest sign-in stands in for real accounts (swap for NextAuth / Clerk). */
 export function AuthGate({ children }: { children: ReactNode }) {
   const hydrated = useAppStore((s) => s.hydrated);
   const user = useAppStore((s) => s.user);
@@ -17,20 +16,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (user) return <>{children}</>;
 
   return (
-    <div className="relative flex min-h-[85vh] items-center justify-center px-4 pt-20">
-      <div className="pointer-events-none absolute left-1/2 top-[-10rem] -z-10 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,106,61,0.25),transparent)]" />
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="card w-full max-w-sm p-8 text-center shadow-[0_40px_100px_-30px_rgba(255,106,61,0.35)]"
-      >
-        <LogoMark className="mx-auto mb-6 h-14 w-14" />
-        <h2 className="text-3xl font-semibold tracking-tight">
-          Jump <span className="serif text-ember">right in.</span>
-        </h2>
-        <p className="mt-2 text-sm text-white/60">No sign-up for the demo. We&apos;ll keep your campaigns on this device.</p>
+    <div className="flex min-h-[85vh] items-center justify-center px-6 pt-12">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm text-center">
+        <LogoMark className="mx-auto h-14 w-14" />
+        <h1 className="t-title mt-6">Sign in to ImpactForge.</h1>
+        <p className="mt-3 text-[17px] text-ink-2">No account needed for the demo. Your campaigns are saved on this device.</p>
         <form
-          className="mt-6 space-y-3"
+          className="mt-8 space-y-3"
           onSubmit={(e) => {
             e.preventDefault();
             loginAsGuest(name.trim() || "Guest");
@@ -39,13 +31,14 @@ export function AuthGate({ children }: { children: ReactNode }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your first name (optional)"
+            placeholder="First name (optional)"
             maxLength={24}
-            className="h-11 w-full rounded-full border border-white/10 bg-white/5 px-5 text-sm outline-none placeholder:text-white/35 focus:border-white/30"
+            autoComplete="given-name"
+            className="field"
           />
-          <ShimmerButton type="submit" className="w-full">
-            Login as Guest
-          </ShimmerButton>
+          <button type="submit" className="btn-primary w-full">
+            Continue as guest
+          </button>
         </form>
       </motion.div>
     </div>

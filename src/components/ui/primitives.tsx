@@ -5,42 +5,38 @@ import { forwardRef, useEffect, useId, useRef, useState, type ButtonHTMLAttribut
 import { cn, formatNumber } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
-/* ShimmerButton — gradient CTA with a moving light sweep              */
+/* Buttons: Apple-style pills                                           */
 /* ------------------------------------------------------------------ */
 
-type ShimmerButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { size?: "md" | "lg" };
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { size?: "sm" | "md" | "lg"; variant?: "primary" | "secondary" | "dark" };
 
-export const ShimmerButton = forwardRef<HTMLButtonElement, ShimmerButtonProps>(function ShimmerButton(
-  { className, children, size = "md", ...props },
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, children, size = "md", variant = "primary", ...props },
   ref,
 ) {
   return (
     <button
       ref={ref}
       className={cn(
-        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-semibold text-[var(--accent-text)] transition-all duration-300",
-        "bg-[linear-gradient(110deg,var(--c3),var(--c1)_45%,var(--c2))] shadow-[0_0_40px_-8px_var(--glow)] hover:shadow-[0_0_60px_-6px_var(--glow)] hover:scale-[1.02] active:scale-[0.98]",
-        "disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink",
-        size === "lg" ? "h-14 px-8 text-base" : "h-11 px-6 text-sm",
+        variant === "primary" ? "btn-primary" : variant === "dark" ? "btn-dark" : "btn-secondary",
+        size === "lg" && "px-7 py-[15px] text-[17px]",
+        size === "sm" && "btn-sm",
+        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue/30",
         className,
       )}
       {...props}
     >
-      <span className="animate-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+      {children}
     </button>
   );
 });
 
+/** Kept for existing call sites. */
+export const ShimmerButton = Button;
+
 export function GhostButton({ className, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
-      className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 text-sm font-medium text-white/90 backdrop-blur transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60",
-        className,
-      )}
-      {...props}
-    >
+    <button className={cn("btn-secondary", className)} {...props}>
       {children}
     </button>
   );
@@ -105,7 +101,7 @@ export function NumberTicker({
 export function GlowCard({ children, className }: { children: ReactNode; className?: string }) {
   const x = useMotionValue(-400);
   const y = useMotionValue(-400);
-  const bg = useMotionTemplate`radial-gradient(420px circle at ${x}px ${y}px, color-mix(in oklab, var(--c1) 18%, transparent), transparent 70%)`;
+  const bg = useMotionTemplate`radial-gradient(420px circle at ${x}px ${y}px, rgba(0,113,227,0.06), transparent 70%)`;
   const onMove = (e: MouseEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     x.set(e.clientX - r.left);
@@ -118,7 +114,7 @@ export function GlowCard({ children, className }: { children: ReactNode; classNa
         x.set(-400);
         y.set(-400);
       }}
-      className={cn("group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl", className)}
+      className={cn("group relative overflow-hidden rounded-[22px] bg-mist", className)}
     >
       <motion.div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -165,7 +161,7 @@ export function ProgressRing({
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="rgb(255 255 255 / 0.08)" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="rgb(0 0 0 / 0.06)" strokeWidth={stroke} fill="none" />
         <motion.circle
           cx={size / 2}
           cy={size / 2}
@@ -283,5 +279,19 @@ export function Typewriter({ phrases, className }: { phrases: string[]; classNam
       {text}
       <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-current" />
     </span>
+  );
+}
+
+/** Single-element fade-up (keeps one continuous gradient across a phrase, unlike BlurText). */
+export function FadeUp({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+  return (
+    <motion.span
+      className={className}
+      initial={{ opacity: 0, y: 14, filter: "blur(10px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.span>
   );
 }

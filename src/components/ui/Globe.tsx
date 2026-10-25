@@ -22,7 +22,7 @@ const hexToRgb = (hex: string): [number, number, number] => {
 };
 
 /** WebGL dotted globe (cobe), slowly drifting around Pakistan, draggable. */
-export function Globe({ className, color = "#ff6a3d" }: { className?: string; color?: string }) {
+export function Globe({ className, color = "#ff6a3d", light = false }: { className?: string; color?: string; light?: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const pointer = useRef<number | null>(null);
   const drag = useRef(0);
@@ -44,14 +44,14 @@ export function Globe({ className, color = "#ff6a3d" }: { className?: string; co
       height: width * 2,
       phi: base,
       theta: 0.45,
-      dark: 1,
-      diffuse: 1.4,
+      dark: light ? 0 : 1,
+      diffuse: light ? 1.2 : 1.4,
       mapSamples: 18000,
-      mapBrightness: 5,
-      mapBaseBrightness: 0.02,
-      baseColor: [0.16, 0.14, 0.18],
+      mapBrightness: light ? 6 : 5,
+      mapBaseBrightness: light ? 0 : 0.02,
+      baseColor: light ? [1, 1, 1] : [0.16, 0.14, 0.18],
       markerColor: rgb,
-      glowColor: [0.35, 0.18, 0.14],
+      glowColor: light ? [0.92, 0.93, 0.96] : [0.35, 0.18, 0.14],
       markers: [{ location: CAMPUS, size: 0.09, color: [1, 1, 1] }, ...IMPACT_SITES.map((s) => ({ location: s.location, size: 0.05 }))],
       arcs: IMPACT_SITES.map((s) => ({ from: CAMPUS, to: s.location })),
       arcColor: rgb,
@@ -81,7 +81,7 @@ export function Globe({ className, color = "#ff6a3d" }: { className?: string; co
       window.removeEventListener("resize", onResize);
       globe.destroy();
     };
-  }, [color]);
+  }, [color, light]);
 
   return (
     <div className={cn("relative aspect-square w-full", className)}>

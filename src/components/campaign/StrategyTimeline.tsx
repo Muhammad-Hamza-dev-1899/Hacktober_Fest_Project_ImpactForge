@@ -17,11 +17,11 @@ const CHANNEL_META: Record<Channel, { icon: LucideIcon; label: string }> = {
 type Phase = "Launch" | "Momentum" | "Peak" | "Final push" | "Report";
 
 const PHASE_STYLE: Record<Phase, string> = {
-  Launch: "var(--c3)",
-  Momentum: "var(--c1)",
-  Peak: "var(--c2)",
-  "Final push": "var(--c1)",
-  Report: "#34d399",
+  Launch: "var(--d1)",
+  Momentum: "var(--d1)",
+  Peak: "var(--d2)",
+  "Final push": "var(--d2)",
+  Report: "#34c759",
 };
 
 /** Derives the campaign arc from the plan itself, so any AI-generated plan gets phases. */
@@ -44,7 +44,7 @@ export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
   return (
     <div>
       {/* campaign arc */}
-      <div className="card mb-6 p-5 sm:p-6">
+      <div className="mb-5 rounded-[22px] bg-mist p-5 sm:p-6">
         <div className="flex gap-1">
           {days.map((d, i) => (
             <motion.div
@@ -59,7 +59,7 @@ export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
           ))}
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-white/55">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-ink-2">
             {(Object.keys(PHASE_STYLE) as Phase[])
               .filter((p) => phases.includes(p))
               .map((p) => (
@@ -73,8 +73,8 @@ export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
             {channels.map(([c, n]) => {
               const I = CHANNEL_META[c as Channel].icon;
               return (
-                <span key={c} className="inline-flex items-center gap-1 rounded-full bg-white/[0.05] px-2.5 py-1 text-[11px] text-white/60">
-                  <I className="h-3 w-3" /> {CHANNEL_META[c as Channel].label} <span className="text-white/35">×{n}</span>
+                <span key={c} className="inline-flex items-center gap-1 rounded-full bg-raised px-2.5 py-1 text-[12px] text-ink-2">
+                  <I className="h-3 w-3" /> {CHANNEL_META[c as Channel].label} <span>×{n}</span>
                 </span>
               );
             })}
@@ -94,9 +94,7 @@ export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: (i % 3) * 0.06, ease: [0.16, 1, 0.3, 1] }}
-              className={cn(
-                "card group relative flex flex-col overflow-hidden p-5 transition hover:-translate-y-0.5 hover:border-white/15",
-              )}
+              className={cn("relative flex flex-col overflow-hidden rounded-[22px] bg-mist p-6")}
             >
               <span
                 className="absolute inset-x-0 top-0 h-px"
@@ -104,26 +102,27 @@ export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
               />
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-2">
-                  <span className="serif text-3xl leading-none text-white/90">{String(d.day).padStart(2, "0")}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: PHASE_STYLE[phase] }}>
+                  <span className="text-[13px] font-semibold text-ink-2">Day {d.day}</span>
+                  <span className="inline-flex items-center gap-1 text-[13px] text-ink-2">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: PHASE_STYLE[phase] }} aria-hidden />
                     {phase}
                   </span>
                 </div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-white/65">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-raised px-2.5 py-1 text-[12px] text-ink-2">
                   <I className="h-3.5 w-3.5" /> {meta.label}
                 </span>
               </div>
-              <h4 className="mt-4 font-semibold leading-snug">{d.title}</h4>
+              <h3 className="mt-4 text-[19px] font-semibold leading-snug tracking-[-0.01em]">{d.title}</h3>
               <ul className="mt-2.5 flex-1 space-y-1.5">
                 {d.tasks.map((t) => (
-                  <li key={t} className="flex gap-2 text-[13px] leading-relaxed text-white/55">
-                    <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
+                  <li key={t} className="flex gap-2 text-[15px] leading-relaxed text-ink-2">
+                    <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-ink-2/50" />
                     {t}
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-white/80">
-                <Target className="h-3 w-3 text-[var(--c1)]" /> {d.kpi}
+              <p className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-raised px-2.5 py-1 text-[13px] font-medium text-ink">
+                <Target className="h-3 w-3 text-[var(--d1)]" /> {d.kpi}
               </p>
             </motion.li>
           );

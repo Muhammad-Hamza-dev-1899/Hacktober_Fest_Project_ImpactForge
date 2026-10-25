@@ -23,4 +23,4 @@ ImpactForge is MIT licensed. It depends on these open-source packages, each unde
 
 The hero backgrounds (spotlight, aurora, beams, orbit), ember particles, generative cover art, shimmer button, number ticker, marquee, animated border and glow card in `src/components/ui/` were **written from scratch for this project**, inspired by the visual style of [Aceternity UI](https://ui.aceternity.com) and [Magic UI](https://magicui.design). No source code was copied from either library.
 
-Fonts: [Geist & Geist Mono](https://github.com/vercel/geist-font) and [Instrument Serif](https://github.com/Instrument/instrument-serif), all under the SIL Open Font License 1.1, served through `next/font`.
+Fonts: the platform system font (SF Pro on Apple devices) with [Inter](https://rsms.me/inter/) as the fallback and [Geist Mono](https://github.com/vercel/geist-font) for code, both under the SIL Open Font License 1.1, served through `next/font`. The visual language follows Apple's Human Interface Guidelines as design principles; no Apple assets or marks are used.

@@ -37,18 +37,27 @@ Campus charity drives run on WhatsApp forwards and Google Forms. Organizers lose
 | 🎬 | **Generation Theater** | While Claude works, you watch the campaign page assemble itself: skeletons per step, then the real title, palette and cover art snap in. |
 | 🎨 | **Generative cover art** | Every campaign gets a unique poster built from its id, palette and hero style: mesh light, pattern, grain and an icon medallion. No stock photos. |
 | 🌍 | **Campus-to-valley globe** | A live WebGL globe shows donation flows from NUST, Islamabad to Gilgit, Skardu, Tharparkar, Dadu and Kech. |
+| 💳 | **Real checkout** | Optional tip, fee cover (the cause nets 100%), monthly giving, sponsor matching and an itemized total. Stripe Checkout when configured, demo mode otherwise. |
+| 🧾 | **Receipts** | A printable, itemized receipt for every gift, with the budget allocation. |
+| 🔎 | **Explore** | Search, filter by cause, and sort by trending, most funded or newest. |
+| 📊 | **Organizer dashboard** | Raised over time, visitors-to-donors funnel, CSV export, plan usage, and a platform-revenue view. |
+| ✏️ | **Edit, rewrite, undo** | Organizers edit any AI copy, regenerate with AI (Pro) and undo the rewrite. |
 
 ## 🖼️ Screenshots
 
 | Landing | Generation Theater | Generated campaign |
 |---|---|---|
-| ![Landing](public/screenshots/home.png) | ![Generation theater](public/screenshots/theater.png) | ![Campaign](public/screenshots/campaign.png) |
+| ![Landing](public/screenshots/home.png) | ![Generation Theater](public/screenshots/theater.png) | ![Campaign](public/screenshots/campaign.png) |
 
-![Live bento: prompt-to-JSON, Sankey, plan board, Pakistan globe](public/screenshots/bento.png)
+![Feature tiles](public/screenshots/tiles.png)
 
-| Wrapped: follow the money | Wrapped: who it reached | Wrapped: share card | Mobile |
-|---|---|---|---|
-| ![Sankey](public/screenshots/wrapped-sankey.png) | ![Network](public/screenshots/wrapped-network.png) | ![Share](public/screenshots/wrapped-share.png) | ![Mobile](public/screenshots/mobile-campaign.png) |
+| Checkout | Receipt | Impact Wrapped |
+|---|---|---|
+| ![Checkout](public/screenshots/checkout.png) | ![Receipt](public/screenshots/receipt.png) | ![Wrapped](public/screenshots/wrapped.png) |
+
+| Pricing | Dashboard |
+|---|---|
+| ![Pricing](public/screenshots/pricing.png) | ![Dashboard](public/screenshots/dashboard.png) |
 
 ## 🏗️ Architecture
 
@@ -68,12 +77,15 @@ flowchart LR
   D --> W[Impact Wrapped]
 ```
 
-### Design system: "Forge"
+### Design system: Apple's design language
 
-- **Molten-ember brand.** Gold, orange and magenta on a warm near-black, with drifting ember particles and film grain. It's deliberately not another teal-on-black AI template.
-- **Editorial type.** Tight Geist headlines paired with *Instrument Serif* italics on the emotional words ("into a *movement.*").
-- **Per-campaign identity.** The AI chooses 1 of 6 palettes and 4 hero styles. Pages, cover art, confetti and Wrapped slides all re-skin through CSS variables.
-- **Accessible data viz.** Chart colors come from a fixed, colorblind-validated palette and always carry text labels. All motion respects `prefers-reduced-motion`.
+Built against the principles of Apple's Human Interface Guidelines (purpose, simplicity, craft, accessibility):
+
+- **Light canvas, system type.** SF Pro on Apple devices (Inter fallback), `#f5f5f7` tiles, Apple-blue pill CTAs, a frosted 48px global nav and a sticky per-campaign sub-nav.
+- **One signature element.** The Intelligence glow is reserved for AI moments: the prompt and the Generation Theater. Everything else stays quiet.
+- **Identity in the content layer.** Each campaign's palette lives in its generative cover art and title gradient, not in the chrome.
+- **Accessible by default.** Secondary text at 5.0:1 (never `#86868b` for small text), 44px touch targets, labeled icon buttons, light and dark appearance following the system, and support for `prefers-reduced-motion`, `prefers-reduced-transparency` and `prefers-contrast`.
+- **Sheets, not pages, for one-task flows.** Donate and upgrade are bottom sheets with a grabber, drag-to-dismiss, Escape and an explicit close.
 
 ### Engineering decisions
 
@@ -87,6 +99,28 @@ flowchart LR
 - **Accessible data viz.** Chart colors use a fixed, colorblind-validated palette (checked for CVD separation and ≥ 3:1 contrast on the dark surface), always paired with direct labels. Motion respects `prefers-reduced-motion`.
 - **Modern Next.js.** App Router on Next.js 16 with Cache Components. Curated campaigns are prerendered with `generateStaticParams`, and generated ones stream in behind `<Suspense>`.
 
+## 💰 Business model
+
+ImpactForge is free for students and sustainable without a platform fee:
+
+| Stream | How it works | Where in code |
+|---|---|---|
+| Donor tips | Optional 0/5/10/15% tip at checkout (default 10%) | `computeCheckout` in `src/lib/monetization.ts` |
+| Society Pro | PKR 2,499/mo or PKR 24,990/yr: unlimited campaigns, AI rewrite, monthly giving, analytics, CSV, no badge | `PLANS`, `UpsellSheet`, plan gating in studio and dashboard |
+| Campus | Custom: sponsor-matching marketplace, verified NGOs, SSO, white-label | `/pricing#campus` |
+| Sponsor listing fee | 5% of matched funds, paid by the sponsor | `matchFor`, `platformRevenue` |
+
+Donors can **cover the processing fee** (grossed up so the cause nets exactly 100%). The server recomputes every amount, and the pricing page's calculator uses the same function as checkout. The dashboard's **Billing** tab shows plan usage and a platform-revenue roll-up (tips, sponsor fees, subscription MRR, GMV, take rate).
+
+### Payments
+
+| Mode | When | Behavior |
+|---|---|---|
+| Demo | No `STRIPE_SECRET_KEY` | Instant mock receipt, clearly labeled. No card data leaves the browser. |
+| Stripe | `STRIPE_SECRET_KEY` set | Hosted Stripe Checkout (one-time or monthly), confirmed server-side at `/checkout/success`. Webhooks verified at `/api/webhooks/stripe` (HMAC, 5-minute replay window). |
+
+Stripe doesn't onboard Pakistani merchants directly; it's the reference implementation. A PayFast, JazzCash or Easypaisa provider implements the same server interface.
+
 ## 🧰 Tech stack
 
 | Layer | Tools |
@@ -94,7 +128,8 @@ flowchart LR
 | Framework | Next.js 16 (App Router, Cache Components), React 19, TypeScript (strict) |
 | Styling | Tailwind CSS v4, CSS-variable theme tokens |
 | Motion & UI | Motion (Framer Motion), custom Aceternity/Magic-UI-style components, canvas ember particles, [cobe](https://github.com/shuding/cobe) WebGL globe |
-| Typography | Geist + Geist Mono, Instrument Serif italic for editorial accents |
+| Typography | System SF Pro (Inter fallback), Geist Mono for code |
+| Payments | Stripe Checkout over REST (no SDK), HMAC-verified webhooks, demo fallback |
 | Data viz | Recharts (donut, Sankey), hand-built animated SVG node graph |
 | AI | Anthropic Claude API (structured outputs), Zod |
 | State | Zustand + localStorage persistence |
@@ -124,6 +159,9 @@ Open [http://localhost:3000](http://localhost:3000), type a cause, and hit **For
 | `AI_TIMEOUT_MS` | `25000` | Abort and fall back after this long |
 | `DEMO_MODE` | `false` | Force curated campaigns (handy on flaky venue Wi-Fi) |
 | `NEXT_PUBLIC_REPO_URL` | (none) | GitHub link shown in the navbar |
+| `STRIPE_SECRET_KEY` | (none) | Enables real Stripe Checkout; demo mode without it |
+| `STRIPE_WEBHOOK_SECRET` | (none) | Verifies `/api/webhooks/stripe` events |
+| `STRIPE_CURRENCY` | `pkr` | Checkout currency |
 
 ### Scripts
 
@@ -132,7 +170,7 @@ npm run dev           # dev server
 npm run build         # production build
 npm run lint          # ESLint
 npm run typecheck     # route typegen + tsc --noEmit
-npm test              # unit tests (normalizer, fallback, impact engine, schemas)
+npm test              # unit tests (normalizer, fallback, impact engine, checkout math, Stripe signatures)
 npm run format        # Prettier
 ```
 
@@ -149,14 +187,19 @@ src/
 │   ├── create/                   # Prompt Studio
 │   ├── c/[slug]/                 # generated campaign page
 │   ├── impact/[donationId]/      # Impact Wrapped (try /impact/demo)
-│   ├── dashboard/                # your campaigns & Wrapped stories
-│   └── api/generate/route.ts     # AI orchestration endpoint
+│   ├── dashboard/                # analytics, campaigns, gifts, billing
+│   ├── pricing/ explore/         # plans + calculator · search & filters
+│   ├── receipt/[donationId]/     # printable receipt
+│   ├── checkout/success/         # Stripe return URL
+│   └── api/                      # generate · checkout · checkout/verify · webhooks/stripe
 ├── components/
 │   ├── ui/                       # backgrounds, ShimmerButton, NumberTicker, GlowCard, ProgressRing…
 │   ├── studio/                   # PromptStudio, GenerationTheater
 │   ├── campaign/                 # CampaignView, DonateDialog, BudgetDonut, StrategyTimeline, Dashboard
 │   └── wrapped/                  # WrappedStory engine + 7 slides
 ├── lib/
+│   ├── monetization.ts           # plans, checkout math, sponsor matching, revenue
+│   ├── payments/                 # Stripe client, browser checkout, mock provider
 │   ├── schema.ts                 # every Zod schema & type
 │   ├── normalize.ts              # AI output → strict Campaign
 │   ├── themes.ts                 # palette tokens + validated chart palette
@@ -173,7 +216,7 @@ tests/                            # node:test suites
 The project was built spec-first in the **Kiro IDE**. Everything is in [`.kiro/`](.kiro):
 
 - **Steering** ([`.kiro/steering`](.kiro/steering)): always-on rules for product scope, tech constraints, structure, and a design system (theme tokens, motion budget, mobile-first).
-- **Specs** ([`.kiro/specs`](.kiro/specs)): EARS-format requirements, design docs and task lists for **Campaign-in-a-Box** and **Impact Wrapped**.
+- **Specs** ([`.kiro/specs`](.kiro/specs)): EARS-format requirements, design docs and task lists for **Campaign-in-a-Box**, **Impact Wrapped** and **Monetization & payments**.
 - **Hooks** ([`.kiro/hooks`](.kiro/hooks)):
   - `seed-schema-guard`: when the schema or seed JSON changes, re-validates every fallback campaign so the offline demo can't break.
   - `theme-token-lint`: flags hardcoded campaign colors and motion that ignores reduced-motion.
@@ -186,7 +229,7 @@ This is a hackathon prototype focused on a flawless happy path. These parts are 
 | Area | Prototype | Production path |
 |---|---|---|
 | Authentication | One-click "Login as Guest" | NextAuth / Clerk |
-| Payments | Demo checkout (Luhn check, simulated latency) | Stripe / JazzCash / Easypaisa |
+| Payments | Demo checkout by default; real Stripe Checkout when keys are set | PayFast / JazzCash / Easypaisa provider |
 | Persistence | localStorage + curated JSON | Postgres (Supabase / Neon) |
 | Impact data | Deterministic mock (seeded by donation id) | NGO partner reports & receipts |
 
@@ -194,7 +237,8 @@ This is a hackathon prototype focused on a flawless happy path. These parts are 
 
 ## 🗺️ Roadmap
 
-- [ ] Real payments (Stripe, JazzCash, Easypaisa)
+- [x] Stripe Checkout + webhooks (reference provider)
+- [ ] PayFast / JazzCash / Easypaisa provider
 - [ ] NGO verification and receipt uploads feeding real Wrapped data
 - [ ] Stream generation token-by-token into the Generation Theater
 - [ ] AI-generated social assets (Instagram stories, posters)

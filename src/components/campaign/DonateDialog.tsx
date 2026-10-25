@@ -1,31 +1,21 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, Check, CreditCard, LoaderCircle, Lock, ShieldCheck, X } from "lucide-react";
+import { Check, ChevronLeft, CreditCard, LoaderCircle, Lock, Repeat, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Segmented, Sheet, Toggle } from "@/components/billing/Sheet";
 import { CoverArt } from "@/components/ui/CoverArt";
 import { Icon } from "@/components/ui/Icon";
-import { ShimmerButton } from "@/components/ui/primitives";
 import { celebrate } from "@/lib/confetti";
-import { mockPaymentProvider } from "@/lib/mock/payments";
+import { computeCheckout, DEFAULT_TIP, matchFor, TIP_OPTIONS } from "@/lib/monetization";
+import { checkoutDonation, paymentsMode } from "@/lib/payments/client";
+import { luhn } from "@/lib/payments/mock";
 import type { Campaign, Donation } from "@/lib/schema";
-import { cn, formatNumber, formatPKR } from "@/lib/utils";
-import { useAppStore } from "@/store/useAppStore";
+import { cn, formatNumber, formatPKR, unitPhrase } from "@/lib/utils";
+import { useAppStore, usePlan, useSponsor } from "@/store/useAppStore";
 
-type Step = "amount" | "pay" | "processing" | "success";
-
-function translate(campaign: Campaign, amount: number) {
-  const units = [...campaign.impactUnits].reverse();
-  const u = units.find((x) => amount >= x.amountPKR) ?? campaign.impactUnits[0];
-  const n = Math.floor(amount / u.amountPKR);
-  if (n < 1) return { icon: u.icon, text: `${Math.round((amount / u.amountPKR) * 100)}% of ${u.label.replace(/^1\s+/, "a ")}` };
-  const label = u.label.replace(/^1\s+/, "");
-  return {
-    icon: u.icon,
-    text: n === 1 ? (/^1\s/.test(u.label) ? u.label : label.charAt(0).toLowerCase() + label.slice(1)) : `${n} × ${label}`,
-  };
-}
+type Step = "amount" | "review" | "processing" | "success";
 
 const formatCard = (v: string) =>
   v
@@ -34,237 +24,312 @@ const formatCard = (v: string) =>
     .replace(/(.{4})/g, "$1 ")
     .trim();
 
-type DialogProps = { campaign: Campaign; open: boolean; initialAmount?: number; onClose: () => void };
-
-export function DonateDialog({ campaign, open, initialAmount, onClose }: DialogProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [open, onClose]);
-
-  // The panel only mounts while open, so its state resets on every open.
-  return <AnimatePresence>{open && <DonatePanel campaign={campaign} initialAmount={initialAmount} onClose={onClose} />}</AnimatePresence>;
+function Row({ label, value, strong, muted }: { label: string; value: string; strong?: boolean; muted?: boolean }) {
+  return (
+    <div
+      className={cn(
+        "flex items-baseline justify-between gap-4 py-1.5 text-[15px]",
+        strong && "pt-3 text-[17px] font-semibold",
+        muted && "text-ink-2",
+      )}
+    >
+      <span>{label}</span>
+      <span className="tabular-nums">{value}</span>
+    </div>
+  );
 }
 
-function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "open">) {
+type Props = { campaign: Campaign; open: boolean; initialAmount?: number; onClose: () => void };
+
+export function DonateDialog({ campaign, open, initialAmount, onClose }: Props) {
+  return (
+    <Sheet open={open} onClose={onClose} label={`Donate to ${campaign.title}`}>
+      {open && <DonateFlow campaign={campaign} initialAmount={initialAmount} onClose={onClose} />}
+    </Sheet>
+  );
+}
+
+function DonateFlow({ campaign, initialAmount, onClose }: Omit<Props, "open">) {
   const user = useAppStore((s) => s.user);
   const recordDonation = useAppStore((s) => s.recordDonation);
-  const presets = [...campaign.impactUnits.map((u) => u.amountPKR), campaign.impactUnits[0].amountPKR * 4]
-    .filter((v, i, a) => a.indexOf(v) === i)
-    .sort((a, b) => a - b);
+  const sponsor = useSponsor(campaign);
+  const { plan } = usePlan();
+  const ownCampaign = useAppStore((s) => s.campaigns.some((c) => c.id === campaign.id));
+  const monthlyAvailable = campaign.source === "seed" || !ownCampaign || plan.perks.recurring;
+
+  const presets = useMemo(
+    () => [...new Set([...campaign.impactUnits.map((u) => u.amountPKR), campaign.impactUnits[0].amountPKR * 4])].sort((a, b) => a - b),
+    [campaign],
+  );
 
   const [step, setStep] = useState<Step>("amount");
   const [amount, setAmount] = useState(initialAmount ?? presets[1] ?? presets[0]);
-  const [name, setName] = useState(user?.name ?? "");
+  const [monthly, setMonthly] = useState(false);
+  const [tipRate, setTipRate] = useState<number>(DEFAULT_TIP);
+  const [coverFees, setCoverFees] = useState(true);
+  const [name, setName] = useState(user?.name && user.name !== "Guest" ? user.name : "");
   const [card, setCard] = useState("4242 4242 4242 4242");
+  const [mode, setMode] = useState<"stripe" | "mock">("mock");
   const [error, setError] = useState<string | null>(null);
   const [donation, setDonation] = useState<Donation | null>(null);
-  const panel = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void paymentsMode().then(setMode);
+  }, []);
+
+  const b = computeCheckout({ amountPKR: amount, tipRate, coverFees });
+  const match = matchFor(sponsor, amount);
+  const u = campaign.impactUnits[0];
+  const units = Math.floor((amount + match) / u.amountPKR);
+  const impactLine =
+    units >= 1 ? unitPhrase(units, u.label) : `${Math.round(((amount + match) / u.amountPKR) * 100)}% of ${u.label.replace(/^1\s+/, "a ")}`;
 
   const pay = async () => {
     setError(null);
-    setStep("processing");
-    const res = await mockPaymentProvider.charge({ amountPKR: amount, cardNumber: card, name });
-    if (!res.ok) {
-      setError(res.error);
-      setStep("pay");
+    if (mode === "mock" && !luhn(card)) {
+      setError("That card number isn't valid. In demo mode, use 4242 4242 4242 4242.");
       return;
     }
-    const d = recordDonation(campaign, amount, name.trim() || "Anonymous", res.txId);
-    setDonation(d);
-    setStep("success");
-    celebrate(panel.current);
+    setStep("processing");
+    const donorName = name.trim() || "Anonymous";
+    const extras = {
+      tipPKR: b.tipPKR,
+      feeCoveredPKR: b.feeCoveredPKR,
+      matchedPKR: match,
+      sponsorName: match ? sponsor?.name : undefined,
+      recurring: monthly,
+      totalPKR: b.totalPKR,
+    };
+    try {
+      const [r] = await Promise.all([
+        checkoutDonation(
+          {
+            campaignId: campaign.id,
+            campaignSlug: campaign.slug,
+            campaignTitle: campaign.title.slice(0, 80),
+            amountPKR: amount,
+            tipRate,
+            coverFees,
+            recurring: monthly,
+          },
+          {
+            campaignId: campaign.id,
+            amountPKR: amount,
+            donorName,
+            ...extras,
+            recurring: monthly,
+            totalPKR: b.totalPKR,
+            tipPKR: b.tipPKR,
+            feeCoveredPKR: b.feeCoveredPKR,
+            matchedPKR: match,
+          },
+        ),
+        new Promise((r) => setTimeout(r, 1200)),
+      ]);
+      if (r.redirected) return;
+      const d = recordDonation(campaign, amount, donorName, r.txId, extras);
+      setDonation(d);
+      setStep("success");
+      celebrate();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Payment didn't go through. Please try again.");
+      setStep("review");
+    }
   };
 
-  const t = translate(campaign, amount);
-
   return (
-    <motion.div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={(e) => e.target === e.currentTarget && step !== "processing" && onClose()}
-    >
-      <motion.div
-        ref={panel}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Donate to ${campaign.title}`}
-        initial={{ y: 40, opacity: 0, scale: 0.98 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ type: "spring", damping: 26, stiffness: 300 }}
-        className="relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0f0e13] p-6 shadow-[0_0_80px_-20px_var(--glow)] sm:rounded-[2rem] sm:p-7"
-      >
-        {step !== "processing" && (
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 rounded-full p-2 text-white/50 hover:bg-white/5 hover:text-white"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+    <AnimatePresence mode="wait" initial={false}>
+      {step === "amount" && (
+        <motion.div key="amount" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
+          <div className="flex items-center gap-3 pr-10">
+            <CoverArt campaign={campaign} size="sm" animated={false} medallion={false} className="h-12 w-12 shrink-0 rounded-xl" />
+            <div className="min-w-0">
+              <p className="text-[13px] text-ink-2">Donate to</p>
+              <h2 className="truncate text-[19px] font-semibold tracking-[-0.01em]">{campaign.title}</h2>
+            </div>
+          </div>
 
-        <AnimatePresence mode="wait">
-          {step === "amount" && (
-            <motion.div key="amount" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <div className="flex items-center gap-3 pr-8">
-                <CoverArt
-                  campaign={campaign}
-                  size="sm"
-                  animated={false}
-                  medallion={false}
-                  className="h-12 w-12 shrink-0 rounded-2xl border border-white/10"
-                />
-                <div className="min-w-0">
-                  <p className="eyebrow text-[10px] text-white/40">Donate to</p>
-                  <h3 className="truncate text-xl font-semibold tracking-tight">{campaign.title}</h3>
-                </div>
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-2">
-                {presets.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setAmount(p)}
-                    className={cn(
-                      "rounded-2xl border px-4 py-3 text-left transition",
-                      amount === p
-                        ? "border-[var(--c1)] bg-[color-mix(in_oklab,var(--c1)_14%,transparent)]"
-                        : "border-white/10 hover:border-white/25",
-                    )}
-                  >
-                    <span className="block text-lg font-semibold">{formatPKR(p)}</span>
-                  </button>
-                ))}
-              </div>
-              <label className="mt-3 flex h-12 items-center gap-2 rounded-2xl border border-white/10 px-4 focus-within:border-white/30">
-                <span className="text-sm text-white/40">PKR</span>
-                <input
-                  inputMode="numeric"
-                  value={formatNumber(amount)}
-                  onChange={(e) => setAmount(Math.min(10_000_000, Number(e.target.value.replace(/\D/g, "")) || 0))}
-                  className="w-full bg-transparent text-lg outline-none"
-                  aria-label="Custom amount"
-                />
-              </label>
-              <motion.div
-                key={t.text}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-center gap-3 rounded-2xl bg-white/[0.04] p-4"
+          <div className="mt-6 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Amount">
+            {presets.map((p) => (
+              <button
+                key={p}
+                role="radio"
+                aria-checked={amount === p}
+                onClick={() => setAmount(p)}
+                className={cn(
+                  "rounded-2xl border-2 px-4 py-3.5 text-left text-[17px] font-semibold transition",
+                  amount === p ? "border-blue bg-blue/[0.06]" : "border-transparent bg-mist hover:border-line",
+                )}
               >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--c1),var(--c2))] text-ink">
-                  <Icon name={t.icon} className="h-5 w-5" />
-                </span>
-                <p className="text-sm text-white/80">
-                  Your gift covers <span className="font-semibold text-white">{t.text}</span>
-                </p>
-              </motion.div>
-              <ShimmerButton className="mt-6 w-full" size="lg" disabled={amount < 100} onClick={() => setStep("pay")}>
-                Continue <ArrowRight className="h-4 w-4" />
-              </ShimmerButton>
-            </motion.div>
+                {formatPKR(p)}
+              </button>
+            ))}
+          </div>
+          <label className="mt-2 flex h-14 items-center gap-2 rounded-2xl bg-mist px-4 focus-within:ring-4 focus-within:ring-blue/15">
+            <span className="shrink-0 text-[15px] text-ink-2">Other</span>
+            <input
+              inputMode="numeric"
+              value={formatNumber(amount)}
+              onChange={(e) => setAmount(Math.min(10_000_000, Number(e.target.value.replace(/\D/g, "")) || 0))}
+              className="w-full bg-transparent text-right text-[17px] font-semibold outline-none"
+              aria-label="Custom amount in PKR"
+            />
+          </label>
+
+          <div className="mt-4 rounded-2xl bg-mist p-4">
+            <p className="flex items-center gap-2 text-[15px]">
+              <Icon name={u.icon} className="h-5 w-5 shrink-0 text-[var(--d1)]" />
+              <span>
+                Your gift{match ? " + match" : ""} covers <strong className="font-semibold">{impactLine}</strong>
+              </span>
+            </p>
+            {sponsor && match > 0 && (
+              <p className="mt-2 flex items-center gap-2 text-[13px] text-ink-2">
+                <Sparkles className="h-4 w-4 shrink-0 text-[#bf5af2]" />
+                {sponsor.name} adds {formatPKR(match)} ({sponsor.ratio === 1 ? "1:1 match" : `${sponsor.ratio * 100}% match`}).
+              </p>
+            )}
+          </div>
+
+          {monthlyAvailable && (
+            <div className="mt-2 border-b border-line/60">
+              <Toggle checked={monthly} onChange={setMonthly} label="Give monthly" hint="Cancel anytime from your dashboard." />
+            </div>
           )}
 
-          {(step === "pay" || step === "processing") && (
-            <motion.div key="pay" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <button onClick={() => setStep("amount")} disabled={step === "processing"} className="text-xs text-white/50 hover:text-white">
-                ← {formatPKR(amount)}
-              </button>
-              <h3 className="mt-2 text-xl font-semibold">Payment details</h3>
-              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
-                <ShieldCheck className="h-3.5 w-3.5" /> Demo checkout, no real charge
-              </p>
-              <form
-                className="mt-5 space-y-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void pay();
-                }}
-              >
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Name on Wrapped (or leave blank)"
-                  className="h-12 w-full rounded-2xl border border-white/10 bg-transparent px-4 text-sm outline-none focus:border-white/30"
-                />
-                <label className="flex h-12 items-center gap-3 rounded-2xl border border-white/10 px-4 focus-within:border-white/30">
-                  <CreditCard className="h-4 w-4 text-white/40" />
+          <button className="btn-primary mt-6 w-full" disabled={amount < 100} onClick={() => setStep("review")}>
+            Continue
+          </button>
+          {amount < 100 && <p className="mt-2 text-center text-[13px] text-ink-2">The minimum gift is PKR 100.</p>}
+        </motion.div>
+      )}
+
+      {(step === "review" || step === "processing") && (
+        <motion.div key="review" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
+          <button onClick={() => setStep("amount")} disabled={step === "processing"} className="link -ml-1 text-[15px] disabled:opacity-40">
+            <ChevronLeft className="h-4 w-4" /> Amount
+          </button>
+          <h2 className="mt-2 text-[24px] font-semibold tracking-[-0.01em]">Review your gift</h2>
+
+          <div className="mt-5">
+            <p className="text-[15px]">Add a tip for ImpactForge</p>
+            <p className="text-[13px] text-ink-2">There&apos;s no platform fee. Tips keep it free for students.</p>
+            <Segmented
+              className="mt-3"
+              label="Tip"
+              value={tipRate}
+              onChange={setTipRate}
+              options={TIP_OPTIONS.map((t) => ({ value: t, label: t === 0 ? "None" : `${t * 100}%` }))}
+            />
+          </div>
+          <div className="mt-2 border-b border-line/60">
+            <Toggle
+              checked={coverFees}
+              onChange={setCoverFees}
+              label="Cover processing fees"
+              hint={`So 100% of your ${formatPKR(amount)} reaches the cause.`}
+            />
+          </div>
+
+          <div className="mt-4 rounded-2xl bg-mist px-4 py-3">
+            <Row label="Donation" value={formatPKR(b.donationPKR)} />
+            {match > 0 && <Row label={`${sponsor?.name} match`} value={`+ ${formatPKR(match)}`} muted />}
+            {b.tipPKR > 0 && <Row label="Tip to ImpactForge" value={formatPKR(b.tipPKR)} />}
+            {b.feeCoveredPKR > 0 && <Row label="Processing fee" value={formatPKR(b.feeCoveredPKR)} />}
+            <div className="mt-1 border-t border-line" />
+            <Row label={monthly ? "Total per month" : "Total"} value={formatPKR(b.totalPKR)} strong />
+            {!coverFees && (
+              <p className="pb-1 text-[13px] text-ink-2">The cause receives about {formatPKR(b.netToCausePKR)} after processing fees.</p>
+            )}
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Name on receipt (optional)"
+              className="field"
+              autoComplete="name"
+            />
+            {mode === "mock" ? (
+              <>
+                <label className="field flex items-center gap-3">
+                  <CreditCard className="h-4 w-4 shrink-0 text-ink-2" aria-hidden />
                   <input
                     value={card}
                     onChange={(e) => setCard(formatCard(e.target.value))}
                     inputMode="numeric"
-                    className="w-full bg-transparent font-mono text-sm tracking-wider outline-none"
+                    autoComplete="cc-number"
+                    className="w-full bg-transparent font-mono text-[15px] tracking-wider outline-none"
                     aria-label="Card number"
                   />
                 </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    defaultValue="12 / 29"
-                    aria-label="Expiry"
-                    className="h-12 rounded-2xl border border-white/10 bg-transparent px-4 font-mono text-sm outline-none"
-                  />
-                  <input
-                    defaultValue="123"
-                    aria-label="CVC"
-                    className="h-12 rounded-2xl border border-white/10 bg-transparent px-4 font-mono text-sm outline-none"
-                  />
-                </div>
-                {error && <p className="text-sm text-rose-300">{error}</p>}
-                <ShimmerButton type="submit" size="lg" className="!mt-5 w-full" disabled={step === "processing"}>
-                  {step === "processing" ? (
-                    <>
-                      <LoaderCircle className="h-4 w-4 animate-spin" /> Securing your donation…
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="h-4 w-4" /> Donate {formatPKR(amount)}
-                    </>
-                  )}
-                </ShimmerButton>
-              </form>
-            </motion.div>
+                <p className="flex items-center gap-1.5 text-[13px] text-ink-2">
+                  <ShieldCheck className="h-4 w-4 text-[#34c759]" /> Demo mode. No real charge is made.
+                </p>
+              </>
+            ) : (
+              <p className="flex items-center gap-1.5 text-[13px] text-ink-2">
+                <Lock className="h-4 w-4" /> You&apos;ll enter card details on a secure Stripe page.
+              </p>
+            )}
+          </div>
+
+          {error && (
+            <p role="alert" className="mt-3 text-[14px] text-[#d70015]">
+              {error}
+            </p>
           )}
 
-          {step === "success" && donation && (
-            <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-4 text-center">
-              <motion.div
-                initial={{ scale: 0, rotate: -30 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
-                className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(135deg,var(--c3),var(--c1),var(--c2))] shadow-[0_0_60px_-4px_var(--glow)]"
-              >
-                <Check className="h-10 w-10 text-ink" strokeWidth={3} />
-              </motion.div>
-              <h3 className="mt-6 text-2xl font-semibold">
-                Thank you{donation.donorName !== "Anonymous" ? `, ${donation.donorName}` : ""}!
-              </h3>
-              <p className="mt-2 text-white/60">
-                Your <span className="text-white">{formatPKR(donation.amountPKR)}</span> is on its way to {donation.ripple.direct}{" "}
-                {campaign.beneficiaryNoun} in {campaign.region}.
-              </p>
-              <p className="mt-2 font-mono text-[11px] text-white/30">{donation.txId}</p>
-              <Link
-                href={`/impact/${donation.id}`}
-                className="mt-7 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-white font-semibold text-ink transition hover:bg-white/90"
-              >
-                See your Impact Wrapped <ArrowRight className="h-4 w-4" />
-              </Link>
-              <button onClick={onClose} className="mt-3 text-sm text-white/50 hover:text-white">
-                Back to campaign
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+          <button className="btn-primary mt-6 w-full" onClick={pay} disabled={step === "processing"}>
+            {step === "processing" ? (
+              <>
+                <LoaderCircle className="h-4 w-4 animate-spin" /> Processing…
+              </>
+            ) : (
+              <>
+                {monthly && <Repeat className="h-4 w-4" />} Pay {formatPKR(b.totalPKR)}
+                {monthly ? " monthly" : ""}
+              </>
+            )}
+          </button>
+        </motion.div>
+      )}
+
+      {step === "success" && donation && (
+        <motion.div key="success" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="pt-4 text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.1 }}
+            className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#34c759] text-white"
+          >
+            <Check className="h-8 w-8" strokeWidth={3} />
+          </motion.div>
+          <h2 className="mt-5 text-[28px] font-semibold tracking-[-0.01em]">
+            Thank you{donation.donorName !== "Anonymous" ? `, ${donation.donorName}` : ""}.
+          </h2>
+          <p className="mx-auto mt-2 max-w-xs text-[17px] text-ink-2">
+            {formatPKR(donation.amountPKR)}
+            {donation.matchedPKR
+              ? `, doubled to ${formatPKR(donation.amountPKR + donation.matchedPKR)} by ${donation.sponsorName},`
+              : ""}{" "}
+            is on its way to {donation.ripple.direct} {campaign.beneficiaryNoun} in {campaign.region}.
+          </p>
+          {donation.recurring && <p className="mt-2 text-[13px] text-ink-2">Your monthly gift renews automatically.</p>}
+          <Link href={`/impact/${donation.id}`} className="btn-primary mt-7 w-full">
+            See your Impact Wrapped
+          </Link>
+          <div className="mt-4 flex items-center justify-center gap-6 text-[15px]">
+            <Link href={`/receipt/${donation.id}`} className="link">
+              View receipt ›
+            </Link>
+            <button onClick={onClose} className="link">
+              Done
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -460,7 +460,7 @@ export function JourneySlide({ donation }: SlideProps) {
           return (
             <motion.li key={s.label} {...up(0.5 + i * 0.35)} className="relative">
               <span
-                className={`absolute -left-10 top-0.5 grid h-7 w-7 place-items-center rounded-full ${done ? "bg-white text-ink" : "border border-white/40 bg-[#0b0a0f] text-white/70"}`}
+                className={`absolute -left-10 top-0.5 grid h-7 w-7 place-items-center rounded-full ${done ? "bg-white text-[#1d1d1f]" : "border border-white/40 bg-[#0b0a0f] text-white/70"}`}
               >
                 {done ? <Check className="h-4 w-4" strokeWidth={3} /> : <Clock className="h-3.5 w-3.5" />}
               </span>
@@ -556,7 +556,7 @@ export function ShareSlide({ donation, campaign }: SlideProps) {
         <button
           onClick={download}
           disabled={busy}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white text-sm font-semibold text-ink disabled:opacity-60"
+          className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white text-sm font-semibold text-[#1d1d1f] disabled:opacity-60"
         >
           <Download className="h-4 w-4" /> {busy ? "Saving…" : "Save image"}
         </button>

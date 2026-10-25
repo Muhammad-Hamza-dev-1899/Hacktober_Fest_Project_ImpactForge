@@ -1,42 +1,43 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+/*
+ * ImpactForge design system, in Apple's design language:
+ * light canvas, system SF typography, generous whitespace, #f5f5f7 tiles,
+ * Apple-blue pill CTAs, frosted navigation, and the "Intelligence" glow for AI.
+ */
 
-  --color-ink: #09080b;
-  --color-ink-2: #111015;
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, var(--font-geist-mono), monospace;
+
+  /* Semantic colors: each resolves per appearance (see :root and the dark media query). */
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-canvas: var(--canvas);
+  --color-mist: var(--mist);
+  --color-raised: var(--raised);
+  --color-blue: var(--blue);
+  --color-link: var(--link);
   --color-c1: var(--c1);
   --color-c2: var(--c2);
   --color-c3: var(--c3);
-  --color-accent: var(--accent);
-  --color-accent-text: var(--accent-text);
+  --color-d1: var(--d1);
+  --color-d2: var(--d2);
 
-  --animate-aurora: aurora 18s ease-in-out infinite alternate;
   --animate-shimmer: shimmer 2.8s linear infinite;
   --animate-marquee: marquee 45s linear infinite;
-  --animate-marquee-reverse: marquee 45s linear infinite reverse;
-  --animate-spin-slow: spin 28s linear infinite;
-  --animate-spin-slower: spin 60s linear infinite reverse;
   --animate-float: float 7s ease-in-out infinite;
   --animate-float-delayed: float 7s ease-in-out -3.5s infinite;
   --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
-  --animate-border: border-spin 4s linear infinite;
+  --animate-border: border-spin 3.2s linear infinite;
   --animate-caret: caret 1s steps(1) infinite;
+  --animate-aurora: aurora 18s ease-in-out infinite alternate;
+  --animate-spin-slow: spin 28s linear infinite;
+  --animate-spin-slower: spin 60s linear infinite reverse;
 
-  @keyframes aurora {
-    0% {
-      transform: translate3d(-10%, -6%, 0) rotate(0deg) scale(1);
-    }
-    50% {
-      transform: translate3d(8%, 4%, 0) rotate(8deg) scale(1.15);
-    }
-    100% {
-      transform: translate3d(-4%, 8%, 0) rotate(-6deg) scale(1.05);
-    }
-  }
   @keyframes shimmer {
     0% {
       transform: translateX(-120%) skewX(-20deg);
@@ -82,6 +83,17 @@
       opacity: 0;
     }
   }
+  @keyframes aurora {
+    0% {
+      transform: translate3d(-10%, -6%, 0) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate3d(8%, 4%, 0) rotate(8deg) scale(1.15);
+    }
+    100% {
+      transform: translate3d(-4%, 8%, 0) rotate(-6deg) scale(1.05);
+    }
+  }
 }
 
 @property --border-angle {
@@ -91,95 +103,212 @@
 }
 
 :root {
-  /* Brand "forge" palette. Campaign pages override these via themeVars(). */
+  /*
+   * Semantic tokens, light appearance (contrast on canvas):
+   * ink #1d1d1f 16.8:1 · ink-2 #6e6e73 5.0:1 (small text OK) · ink-3 #6e6e73 (secondary)
+   * link #0066cc 5.6:1 · blue #0071e3 with white text 4.7:1
+   */
+  --canvas: #ffffff;
+  --mist: #f5f5f7;
+  --raised: #ffffff;
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --ink-3: #6e6e73;
+  --line: #d2d2d7;
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --link: #0066cc;
+  --nav: rgba(255, 255, 255, 0.8);
+  /* Chart series (validated light steps; always paired with text labels). */
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  /* Brand defaults. Campaign pages override these via themeVars(). */
   --c1: #ff6a3d;
   --c2: #ff3d77;
   --c3: #ffc061;
-  --accent: #ff7a45;
-  --accent-text: #1c0700;
-  --glow: rgba(255, 106, 61, 0.45);
-  color-scheme: dark;
+  --d1: #0071e3;
+  --d2: #bf5af2;
+  --accent: #0071e3;
+  --accent-text: #ffffff;
+  --glow: rgba(0, 113, 227, 0.25);
+  --intel: linear-gradient(90deg, #ff9f0a, #ff375f 25%, #bf5af2 55%, #0a84ff 80%, #5ac8fa);
+  color-scheme: light dark;
+}
+
+/* Dark appearance follows the system (no app-level toggle). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* ink #f5f5f7 18.1:1 on #000 · ink-2 #a1a1a6 8.0:1 · link #2997ff 6.9:1 */
+    --canvas: #000000;
+    --mist: #1c1c1e;
+    --raised: #2c2c2e;
+    --ink: #f5f5f7;
+    --ink-2: #a1a1a6;
+    --ink-3: #a1a1a6;
+    --line: #424245;
+    --blue: #0071e3;
+    --blue-hover: #0077ed;
+    --link: #2997ff;
+    --nav: rgba(22, 22, 23, 0.8);
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --s4: #c98500;
+    --s5: #d55181;
+  }
+}
+
+/* Dark: campaign gradients use the lighter palette steps so large text keeps >= 3:1 on black. */
+@media (prefers-color-scheme: dark) {
+  .text-gradient {
+    background-image: linear-gradient(100deg, var(--c1), color-mix(in oklab, var(--c2) 70%, white));
+  }
+}
+
+/* Increased contrast: secondary text and hairlines get stronger. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink-2: #424245;
+    --ink-3: #424245;
+    --line: #86868b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink-2: #d2d2d7;
+      --ink-3: #d2d2d7;
+      --line: #a1a1a6;
+    }
+  }
 }
 
 html {
-  background: #09080b;
+  background: var(--canvas);
 }
 
 body {
-  background: #09080b;
-  color: #ecebef;
-  font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.022em;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  font-feature-settings: "ss01", "cv11";
-}
-
-/* Film grain: one fixed, normally-blended layer (blend modes on fixed layers cause repaint artifacts). */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.5'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--c1) 45%, transparent);
-  color: white;
+  background: rgba(0, 113, 227, 0.18);
 }
 
 @layer components {
-  .glass {
-    @apply border border-white/[0.08] bg-white/[0.035] backdrop-blur-xl;
+  /* Typography scale (Apple-style: tight, semibold, generous size). */
+  .t-hero {
+    @apply text-[3rem] leading-[1.05] font-semibold tracking-[-0.015em] sm:text-[4.5rem] lg:text-[5.5rem];
+  }
+  .t-headline {
+    @apply text-[2.25rem] leading-[1.08] font-semibold tracking-[-0.009em] sm:text-[3rem] lg:text-[3.5rem];
+  }
+  .t-title {
+    @apply text-[1.75rem] leading-[1.14] font-semibold tracking-[0.004em] sm:text-[2.5rem];
+  }
+  .t-eyebrow {
+    @apply text-[1.0625rem] font-semibold tracking-[-0.022em] sm:text-[1.3125rem];
+  }
+  .t-lede {
+    @apply text-[1.1875rem] leading-[1.42] font-normal tracking-[0.012em] text-ink-2 sm:text-[1.3125rem] lg:text-[1.5rem];
+  }
+  .eyebrow {
+    @apply text-[12px] font-semibold uppercase tracking-[0.08em];
+  }
+  .serif {
+    font-weight: 600;
+  }
+
+  /* Surfaces */
+  .tile {
+    @apply rounded-[28px] bg-mist;
+  }
+  .tile-dark {
+    @apply rounded-[28px] bg-black text-[#f5f5f7] ring-1 ring-white/10;
   }
   .card {
-    @apply rounded-3xl border border-white/[0.08] bg-[linear-gradient(180deg,rgb(255_255_255/0.05),rgb(255_255_255/0.015))];
-    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+    @apply rounded-[22px] border border-line/50 bg-raised shadow-[0_2px_12px_rgba(0,0,0,0.04)];
+  }
+  .glass {
+    @apply border border-line/50 bg-[var(--nav)] backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  /* Controls */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-[22px] py-3 text-[17px] font-normal leading-none tracking-[-0.022em] transition duration-200 disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-[22px] py-3 text-[17px] font-normal leading-none tracking-[-0.022em] transition duration-200 disabled:pointer-events-none disabled:opacity-40 bg-blue text-white hover:bg-[var(--blue-hover)] active:brightness-95;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-[22px] py-3 text-[17px] font-normal leading-none tracking-[-0.022em] transition duration-200 disabled:pointer-events-none disabled:opacity-40 border border-blue text-blue hover:bg-blue hover:text-white;
+  }
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full px-[22px] py-3 text-[17px] font-normal leading-none tracking-[-0.022em] transition duration-200 disabled:pointer-events-none disabled:opacity-40 bg-ink text-white hover:bg-black;
+  }
+  .btn-sm {
+    @apply px-4 py-2 text-[14px];
+  }
+  .link {
+    @apply inline-flex items-center gap-0.5 text-link hover:underline;
+  }
+  .field {
+    @apply h-12 w-full rounded-xl border border-line bg-raised px-4 text-[17px] text-ink outline-none transition placeholder:text-ink-3 focus:border-blue focus:ring-4 focus:ring-blue/15;
+  }
+
+  /* Text effects */
+  .text-intel {
+    background-image: var(--intel);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .text-gradient {
-    background-image: linear-gradient(100deg, var(--c3), var(--c1) 45%, var(--c2));
+    background-image: linear-gradient(100deg, var(--d1), var(--d2));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .text-ember {
-    background-image: linear-gradient(95deg, #ffd18a 0%, #ff8a4c 35%, #ff4d6d 70%, #ff3d9a 100%);
+    background-image: var(--intel);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .text-silver {
-    background-image: linear-gradient(180deg, #ffffff 30%, rgb(255 255 255 / 0.55));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: inherit;
   }
-  .serif {
-    font-family: var(--font-instrument), ui-serif, Georgia, serif;
-    font-style: italic;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+
+  /* The Apple Intelligence-style glow ring. Put on a wrapper with p-[2px]. */
+  .intel-ring {
+    background: conic-gradient(from var(--border-angle), #ff9f0a, #ff375f, #bf5af2, #0a84ff, #5ac8fa, #ff9f0a);
+    animation: var(--animate-border);
   }
-  .eyebrow {
-    @apply font-mono text-[11px] font-medium uppercase tracking-[0.22em];
+  .border-spin {
+    background: conic-gradient(from var(--border-angle), #ff9f0a, #ff375f, #bf5af2, #0a84ff, #5ac8fa, #ff9f0a);
+    animation: var(--animate-border);
   }
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
-    background-size: 64px 64px;
-  }
+
   .bg-dots {
     background-image: radial-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1px);
     background-size: 20px 20px;
   }
-  .mask-fade-b {
-    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--ink) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--ink) 5%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
   }
-  .mask-fade-t {
-    mask-image: linear-gradient(to top, black 60%, transparent);
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent);
   }
   .mask-radial {
     mask-image: radial-gradient(ellipse at center, black 25%, transparent 72%);
@@ -187,18 +316,15 @@ body::after {
   .mask-fade-x {
     mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   }
-  /* Animated conic border: put on a wrapper with p-px. */
-  .border-spin {
-    background: conic-gradient(
-      from var(--border-angle),
-      transparent 0%,
-      var(--c3) 10%,
-      var(--c1) 20%,
-      var(--c2) 30%,
-      transparent 40%,
-      transparent 100%
-    );
-    animation: var(--animate-border);
+}
+
+/* Reduced transparency: frosted chrome becomes opaque. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --nav: var(--canvas);
+  }
+  .glass {
+    backdrop-filter: none;
   }
 }
 

@@ -1,4 +1,4 @@
-import type { Beneficiary, Campaign, Donation, JourneyStep } from "../schema";
+import type { Beneficiary, Campaign, Donation, DonationExtras, JourneyStep } from "../schema";
 import { pick, seededRandom } from "../utils";
 
 /**
@@ -57,23 +57,26 @@ export function buildDonation(
   txId: string,
   createdAt = new Date().toISOString(),
   priorDonors = campaign.baseDonors,
+  extras: DonationExtras = {},
 ): Donation {
   const rand = seededRandom(id);
+  // A sponsor match multiplies real-world impact, so the story is told on gift + match.
+  const effective = amountPKR + (extras.matchedPKR ?? 0);
   const [u1] = campaign.impactUnits;
 
   // The entry tier is the countable unit ("1 winter coat"), so it drives "your money became N …".
   const unit = u1;
-  const count = Math.max(1, Math.floor(amountPKR / unit.amountPKR));
+  const count = Math.max(1, Math.floor(effective / unit.amountPKR));
 
   // Allocation follows the campaign's published budget exactly (sums to amount).
-  let remaining = amountPKR;
+  let remaining = effective;
   const allocation = campaign.budget.map((b, i) => {
-    const share = i === campaign.budget.length - 1 ? remaining : Math.round((amountPKR * b.percent) / 100);
+    const share = i === campaign.budget.length - 1 ? remaining : Math.round((effective * b.percent) / 100);
     remaining -= share;
     return { category: b.category, amountPKR: share };
   });
 
-  const direct = Math.max(1, Math.min(8, Math.floor(amountPKR / u1.amountPKR)));
+  const direct = Math.max(1, Math.min(8, Math.floor(effective / u1.amountPKR)));
   const towns = townsFor(campaign.region);
   const used = new Set<string>();
   const beneficiaries: Beneficiary[] = Array.from({ length: direct }, (_, i) => {
@@ -111,6 +114,7 @@ export function buildDonation(
     campaignSlug: campaign.slug,
     donorName,
     amountPKR,
+    ...extras,
     createdAt,
     txId,
     allocation,

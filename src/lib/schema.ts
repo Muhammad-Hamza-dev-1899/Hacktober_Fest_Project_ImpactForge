@@ -187,4 +187,13 @@ export type Donation = {
   ripple: { direct: number; household: number; community: number };
   journey: JourneyStep[];
   stats: { donorRank: number; totalDonors: number; percentile: number; streakDays: number };
+  /* Checkout extras (optional so donations saved by older versions still load). */
+  tipPKR?: number;
+  feeCoveredPKR?: number;
+  matchedPKR?: number;
+  sponsorName?: string;
+  recurring?: boolean;
+  totalPKR?: number;
 };
+
+export type DonationExtras = Pick<Donation, "tipPKR" | "feeCoveredPKR" | "matchedPKR" | "sponsorName" | "recurring" | "totalPKR">;

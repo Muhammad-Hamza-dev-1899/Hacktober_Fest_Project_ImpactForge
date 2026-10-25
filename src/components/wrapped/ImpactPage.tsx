@@ -39,12 +39,11 @@ export function ImpactPage({ donationId }: { donationId: string }) {
   if (!resolved) {
     return (
       <div className="mx-auto flex min-h-[80vh] max-w-md pt-20 flex-col items-center justify-center px-4 text-center">
-        <span className="text-5xl">🎁</span>
-        <h1 className="mt-4 font-display text-2xl font-semibold">This Wrapped lives on another device</h1>
-        <p className="mt-2 text-sm text-white/55">
-          Donations in the prototype are stored in the donor&apos;s browser. Watch the demo instead.
+        <h1 className="t-title">This Wrapped is on another device.</h1>
+        <p className="mt-3 text-[17px] text-ink-2">
+          Prototype donations are saved in the donor&apos;s browser. You can watch the demo instead.
         </p>
-        <Link href="/impact/demo" className="mt-6 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink">
+        <Link href="/impact/demo" className="btn-primary mt-7">
           Play the demo Wrapped
         </Link>
       </div>

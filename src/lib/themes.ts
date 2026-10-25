@@ -14,6 +14,8 @@ export type PaletteTokens = {
   accent: string; // CTA background
   accentText: string;
   glow: string; // rgba for shadows
+  d1: string; // deep tones for text/gradients on light surfaces
+  d2: string;
 };
 
 export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
@@ -25,6 +27,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#5eead4",
     accentText: "#042f2e",
     glow: "rgba(45, 212, 191, 0.45)",
+    d1: "#0d9488",
+    d2: "#7c3aed",
   },
   ember: {
     name: "Ember",
@@ -34,6 +38,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#fb923c",
     accentText: "#2a0a00",
     glow: "rgba(251, 146, 60, 0.45)",
+    d1: "#ea580c",
+    d2: "#e11d48",
   },
   glacier: {
     name: "Glacier",
@@ -43,6 +49,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#bae6fd",
     accentText: "#082f49",
     glow: "rgba(125, 211, 252, 0.45)",
+    d1: "#0284c7",
+    d2: "#4f46e5",
   },
   forest: {
     name: "Forest",
@@ -52,6 +60,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#86efac",
     accentText: "#052e16",
     glow: "rgba(74, 222, 128, 0.4)",
+    d1: "#16a34a",
+    d2: "#0d9488",
   },
   sunrise: {
     name: "Sunrise",
@@ -61,6 +71,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#fcd34d",
     accentText: "#3b0a1e",
     glow: "rgba(236, 72, 153, 0.45)",
+    d1: "#d97706",
+    d2: "#db2777",
   },
   midnight: {
     name: "Midnight",
@@ -70,6 +82,8 @@ export const PALETTE_TOKENS: Record<Palette, PaletteTokens> = {
     accent: "#fcd34d",
     accentText: "#1e1b4b",
     glow: "rgba(129, 140, 248, 0.45)",
+    d1: "#4f46e5",
+    d2: "#9333ea",
   },
 };
 
@@ -82,6 +96,8 @@ export function themeVars(palette: Palette): CSSProperties {
     "--accent": t.accent,
     "--accent-text": t.accentText,
     "--glow": t.glow,
+    "--d1": t.d1,
+    "--d2": t.d2,
   } as CSSProperties;
 }
 
@@ -102,4 +118,12 @@ export const FORGE: PaletteTokens = {
   accent: "#ff7a45",
   accentText: "#1c0700",
   glow: "rgba(255, 106, 61, 0.45)",
+  d1: "#ea580c",
+  d2: "#db2777",
 };
+
+/** Light-surface steps of the same categorical hues (validated set; always paired with labels). */
+export const SERIES_LIGHT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"] as const;
+
+/** Appearance-aware chart colors (resolve to the light or dark validated steps). */
+export const SERIES_VAR = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)", "var(--s5)"] as const;

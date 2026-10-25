@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { SEED_CAMPAIGNS } from "../src/data/campaigns";
 import { fallbackCampaign, parsePrompt } from "../src/lib/ai/fallback";
 import { buildDonation } from "../src/lib/mock/impact";
-import { luhn } from "../src/lib/mock/payments";
+import { luhn } from "../src/lib/payments/mock";
 import { buildCampaign, rebalancePercents } from "../src/lib/normalize";
 import { CampaignSchema, type CampaignCopyAI, type StrategyAI } from "../src/lib/schema";
 
