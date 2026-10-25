@@ -19,7 +19,7 @@ const SLIDES: SlideDef[] = [
     id: "intro",
     Component: IntroSlide,
     duration: 6000,
-    bg: "radial-gradient(120% 90% at 20% 10%, var(--c2), transparent 60%), radial-gradient(100% 80% at 90% 90%, var(--c1), transparent 55%), #07080c",
+    bg: "radial-gradient(120% 90% at 20% 10%, var(--c2), transparent 60%), radial-gradient(100% 80% at 90% 90%, var(--c1), transparent 55%), #0b0a0f",
   },
   {
     id: "amount",
@@ -31,13 +31,13 @@ const SLIDES: SlideDef[] = [
     id: "sankey",
     Component: SankeySlide,
     duration: 9500,
-    bg: "radial-gradient(90% 70% at 50% 0%, color-mix(in oklab, var(--c2) 45%, transparent), transparent 70%), #07080c",
+    bg: "radial-gradient(90% 70% at 50% 0%, color-mix(in oklab, var(--c2) 45%, transparent), transparent 70%), #0b0a0f",
   },
   {
     id: "network",
     Component: NetworkSlide,
     duration: 10000,
-    bg: "radial-gradient(80% 60% at 50% 40%, color-mix(in oklab, var(--c1) 30%, transparent), transparent 70%), #05060a",
+    bg: "radial-gradient(80% 60% at 50% 40%, color-mix(in oklab, var(--c1) 30%, transparent), transparent 70%), #09080b",
   },
   {
     id: "ripple",
@@ -49,14 +49,30 @@ const SLIDES: SlideDef[] = [
     id: "journey",
     Component: JourneySlide,
     duration: 9000,
-    bg: "radial-gradient(100% 80% at 0% 100%, color-mix(in oklab, var(--c1) 35%, transparent), transparent 60%), #07080c",
+    bg: "radial-gradient(100% 80% at 0% 100%, color-mix(in oklab, var(--c1) 35%, transparent), transparent 60%), #0b0a0f",
   },
   {
     id: "share",
     Component: ShareSlide,
     duration: 60_000,
-    bg: "radial-gradient(110% 80% at 50% 0%, color-mix(in oklab, var(--c2) 55%, transparent), transparent 65%), radial-gradient(90% 70% at 50% 100%, color-mix(in oklab, var(--c1) 40%, transparent), transparent 60%), #07080c",
+    bg: "radial-gradient(110% 80% at 50% 0%, color-mix(in oklab, var(--c2) 55%, transparent), transparent 65%), radial-gradient(90% 70% at 50% 100%, color-mix(in oklab, var(--c1) 40%, transparent), transparent 60%), #0b0a0f",
   },
+];
+
+const SHAPES = [
+  { right: -180, top: -120 },
+  { left: -200, bottom: -160 },
+  { right: -220, bottom: -60 },
+  { left: -160, top: 120 },
+  { right: -140, top: 260 },
+  { left: -220, top: -140 },
+  { right: -200, bottom: -200 },
+];
+const BLOBS = [
+  { left: -60, top: 80 },
+  { right: -40, top: 40 },
+  { left: 40, bottom: -40 },
+  { right: -60, bottom: 120 },
 ];
 
 function Segment({ i, index, progress }: { i: number; index: number; progress: MotionValue<number> }) {
@@ -175,6 +191,24 @@ export function WrappedStory({ donation, campaign }: SlideProps) {
           transition={{ duration: 0.6 }}
         />
         <div className="bg-dots pointer-events-none absolute inset-0 opacity-20" />
+        {/* Wrapped-style geometry: a big shape per slide that swings into place */}
+        <motion.div
+          key={`shape-${slide.id}`}
+          aria-hidden
+          className="pointer-events-none absolute rounded-full border-[28px] border-white/[0.06]"
+          style={{ width: 420, height: 420, ...SHAPES[index % SHAPES.length] }}
+          initial={{ scale: 0.6, opacity: 0, rotate: -30 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        />
+        <motion.div
+          key={`blob-${slide.id}`}
+          aria-hidden
+          className="pointer-events-none absolute h-72 w-72 rounded-full bg-[var(--c3)] opacity-20 blur-3xl"
+          style={BLOBS[index % BLOBS.length]}
+          animate={{ x: [0, 30, -20, 0], y: [0, -20, 25, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
 
         {/* Chrome */}
         <div className="absolute inset-x-0 top-0 z-20 bg-gradient-to-b from-black/40 to-transparent px-4 pb-6 pt-4">

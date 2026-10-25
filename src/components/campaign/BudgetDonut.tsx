@@ -24,7 +24,7 @@ export function BudgetDonut({ campaign }: { campaign: Campaign }) {
               outerRadius="100%"
               paddingAngle={2}
               cornerRadius={4}
-              stroke="#0b0d12"
+              stroke="#0f0e13"
               strokeWidth={2}
               startAngle={90}
               endAngle={-270}
@@ -40,7 +40,7 @@ export function BudgetDonut({ campaign }: { campaign: Campaign }) {
               cursor={false}
               content={({ active: a, payload }) =>
                 a && payload?.[0] ? (
-                  <div className="rounded-xl border border-white/10 bg-[#0b0d12]/95 px-3 py-2 text-xs shadow-xl">
+                  <div className="rounded-xl border border-white/10 bg-[#0f0e13]/95 px-3 py-2 text-xs shadow-xl">
                     <p className="font-medium text-white">{payload[0].name}</p>
                     <p className="text-white/60">
                       {payload[0].value}% · {formatPKR(Number(payload[0].payload.pkr), { compact: true })}

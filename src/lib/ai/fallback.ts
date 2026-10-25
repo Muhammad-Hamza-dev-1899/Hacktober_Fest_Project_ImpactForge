@@ -66,11 +66,13 @@ export function parsePrompt(prompt: string) {
     return (fromEnd ? w.slice(-n) : w.slice(0, n)).join(" ");
   };
   const title = who ? `${titleCase(words(what, 3, true))} for ${titleCase(words(who, 3))}` : `Project ${titleCase(words(what, 3, true))}`;
-  return { cause, title: title.slice(0, 60), region };
+  // Noun phrase for prose: "buy wheelchairs for…" → "wheelchairs for…"
+  const subject = strip(cause, [VERB]) || cause;
+  return { cause, subject, title: title.slice(0, 60), region };
 }
 
 function genericCampaign(prompt: string): Campaign {
-  const { cause, title, region } = parsePrompt(prompt);
+  const { subject: cause, title, region } = parsePrompt(prompt);
   return {
     id: "generic",
     slug: slugify(title) || "campaign",
@@ -82,7 +84,7 @@ function genericCampaign(prompt: string): Campaign {
     title,
     tagline: `A student-led movement for ${cause}. Small gifts, pooled together, change real lives.`.slice(0, 160),
     story: [
-      `Some problems are too big for one person, but not for a campus. We started this campaign because ${cause} deserves more than sympathy; it needs a plan and people willing to show up.`,
+      `Some problems are too big for one person, but not for a campus. We started this campaign for one reason: ${cause}. That needs more than sympathy; it needs a plan and people willing to show up.`,
       "Every rupee is tracked against a transparent budget and spent with verified local partners. Our student team handles outreach, logistics and reporting, and every donor gets a personal impact report.",
       "Give what you can, share it with three friends, and help us prove what a student community can do in two weeks.",
     ],

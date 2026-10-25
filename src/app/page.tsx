@@ -1,169 +1,96 @@
-import { ArrowRight, BadgeCheck, CalendarDays, GitPullRequest, PieChart, Sparkles, WandSparkles } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
-import { FeaturedCampaigns, LandingStats } from "@/components/campaign/LandingClient";
+import { Bento } from "@/components/landing/Bento";
+import { FinalCTA, Featured, HowItWorks, Pulse } from "@/components/landing/Sections";
+import { Showcase } from "@/components/landing/Showcase";
 import { HeroPrompt } from "@/components/studio/HeroPrompt";
 import { EXAMPLE_PROMPTS } from "@/components/studio/examples";
-import { Aurora, Spotlight } from "@/components/ui/backgrounds";
-import { BlurText, GlowCard, Marquee, Reveal } from "@/components/ui/primitives";
+import { Embers } from "@/components/ui/Embers";
+import { BlurText, Marquee, Reveal } from "@/components/ui/primitives";
 import { SITE } from "@/lib/site";
 
 export default function Home() {
   return (
     <>
       {/* ---------- Hero ---------- */}
-      <section className="relative isolate overflow-hidden">
-        <div className="bg-grid mask-radial pointer-events-none absolute inset-0 -z-10 opacity-70" />
-        <Aurora className="-z-10 opacity-70" />
-        <Spotlight className="-z-10" />
-        <div className="mx-auto flex max-w-5xl flex-col items-center px-4 pb-20 pt-16 text-center sm:px-6 sm:pt-24 md:pb-28">
-          <Link
-            href={SITE.repoUrl}
-            target="_blank"
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-white/75 backdrop-blur transition hover:border-white/25"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-pulse-ring absolute inline-flex h-full w-full rounded-full bg-[var(--c1)]" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--c1)]" />
-            </span>
-            Open source · {SITE.hackathon}
-            <ArrowRight className="h-3 w-3" />
-          </Link>
+      <section className="relative isolate overflow-hidden pt-28 sm:pt-36">
+        {/* light */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/2 top-[-18rem] h-[42rem] w-[70rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,106,61,0.32),rgba(255,61,119,0.12)_55%,transparent)] blur-2xl" />
+          <div className="absolute left-1/2 top-0 h-[38rem] w-[min(90vw,64rem)] -translate-x-1/2 bg-[conic-gradient(from_180deg_at_50%_0%,transparent_38%,rgba(255,200,150,0.10)_47%,rgba(255,220,180,0.16)_50%,rgba(255,200,150,0.10)_53%,transparent_62%)]" />
+          <div className="bg-grid mask-radial absolute inset-x-0 top-0 h-[60rem] opacity-60" />
+          <Embers />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#09080b]" />
+        </div>
 
-          <h1 className="font-display text-[2.6rem] font-semibold leading-[1.02] tracking-tight sm:text-6xl md:text-7xl">
-            <BlurText text="Turn one sentence" />
+        <div className="mx-auto flex max-w-5xl flex-col items-center px-4 text-center sm:px-6">
+          <Reveal>
+            <Link
+              href={SITE.repoUrl}
+              target="_blank"
+              className="group mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-4 text-xs text-white/70 backdrop-blur transition hover:border-white/25"
+            >
+              <span className="rounded-full bg-[linear-gradient(110deg,#ffc061,#ff6a3d,#ff3d77)] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#1c0700]">
+                Open source
+              </span>
+              {SITE.hackathon}
+              <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+            </Link>
+          </Reveal>
+
+          <h1 className="text-[3.1rem] font-semibold leading-[0.95] tracking-[-0.045em] sm:text-7xl md:text-[6rem]">
+            <BlurText text="Turn one sentence" wordClassName="text-silver pb-[0.06em]" />
             <br />
-            <BlurText text="into a movement." delay={0.25} gradient />
+            <BlurText text="into a movement." delay={0.3} gradient className="serif tracking-[-0.02em]" />
           </h1>
-          <Reveal delay={0.5}>
-            <p className="mx-auto mt-6 max-w-xl text-base text-white/60 sm:text-lg">
-              ImpactForge is an AI philanthropy engine for students. Describe a cause and get a designed campaign page, copy and a
-              day-by-day launch plan in seconds. Every donor then gets a <span className="text-white">Wrapped-style</span> story of exactly
-              where their money went.
+
+          <Reveal delay={0.55}>
+            <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-white/55 sm:text-lg">
+              The AI philanthropy engine for students. Describe a cause and get a designed campaign, the story and a day-by-day launch plan.
+              Then every donor sees exactly where their money went.
             </p>
           </Reveal>
 
-          <Reveal delay={0.65} className="mt-10 w-full">
+          <Reveal delay={0.7} className="mt-10 w-full">
             <HeroPrompt />
           </Reveal>
 
-          <Reveal delay={0.8} className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
-            <Link href="/impact/demo" className="inline-flex items-center gap-1.5 text-white/70 transition hover:text-white">
-              <Sparkles className="h-4 w-4 text-[var(--c3)]" /> Watch an Impact Wrapped demo
+          <Reveal delay={0.85} className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+            <Link href="/impact/demo" className="group inline-flex items-center gap-2 text-white/70 transition hover:text-white">
+              <span className="grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-white/5 transition group-hover:border-white/40">
+                <Play className="h-3 w-3 fill-current" />
+              </span>
+              Watch an Impact Wrapped
             </Link>
-            <span className="text-white/20">•</span>
+            <span className="hidden h-4 w-px bg-white/15 sm:block" />
             <Link href="/c/warmth-for-gilgit" className="text-white/70 transition hover:text-white">
               Browse a live campaign →
             </Link>
           </Reveal>
         </div>
 
-        <Marquee className="pb-12">
-          {EXAMPLE_PROMPTS.map((p) => (
-            <span
-              key={p.label}
-              className="glass inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm text-white/70"
-            >
-              <span>{p.emoji}</span> {p.label}
-            </span>
-          ))}
-        </Marquee>
-      </section>
+        <Showcase />
 
-      <LandingStats />
-
-      {/* ---------- Bento ---------- */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-        <Reveal>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--c1)]">What it does</p>
-          <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-5xl">
-            A whole fundraising team, in one prompt.
-          </h2>
-        </Reveal>
-        <div className="mt-12 grid gap-4 md:grid-cols-6">
-          <Reveal className="md:col-span-4">
-            <GlowCard className="h-full p-7">
-              <WandSparkles className="h-6 w-6 text-[var(--c1)]" />
-              <h3 className="mt-4 font-display text-xl font-semibold">Campaign-in-a-Box</h3>
-              <p className="mt-2 max-w-md text-sm text-white/60">
-                Two AI agents run in parallel. One writes the story, impact tiers, FAQs and picks a visual theme; the other plans the launch
-                day by day. Every response is schema-validated before it renders.
-              </p>
-              <div className="mt-6 grid grid-cols-3 gap-2 text-[11px] text-white/60">
-                {["Copy & story", "Theme tokens", "14-day plan"].map((t, i) => (
-                  <div key={t} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                    <div className="mb-2 h-1.5 w-8 rounded-full" style={{ background: `var(${["--c1", "--c2", "--c3"][i]})` }} />
-                    {t}
-                  </div>
-                ))}
-              </div>
-            </GlowCard>
-          </Reveal>
-          <Reveal className="md:col-span-2" delay={0.1}>
-            <GlowCard className="h-full p-7">
-              <PieChart className="h-6 w-6 text-[var(--c3)]" />
-              <h3 className="mt-4 font-display text-xl font-semibold">Impact Wrapped</h3>
-              <p className="mt-2 text-sm text-white/60">
-                A cinematic, swipeable story for every donor: fund flows, the people reached, and a shareable card.
-              </p>
-            </GlowCard>
-          </Reveal>
-          <Reveal className="md:col-span-2" delay={0.05}>
-            <GlowCard className="h-full p-7">
-              <BadgeCheck className="h-6 w-6 text-[var(--c1)]" />
-              <h3 className="mt-4 font-display text-xl font-semibold">Radical transparency</h3>
-              <p className="mt-2 text-sm text-white/60">Every campaign publishes a budget, and every rupee is traced through it.</p>
-            </GlowCard>
-          </Reveal>
-          <Reveal className="md:col-span-2" delay={0.1}>
-            <GlowCard className="h-full p-7">
-              <CalendarDays className="h-6 w-6 text-[var(--c2)]" />
-              <h3 className="mt-4 font-display text-xl font-semibold">Execution, not just ideas</h3>
-              <p className="mt-2 text-sm text-white/60">Daily tasks, channels and KPIs a student team can run alongside classes.</p>
-            </GlowCard>
-          </Reveal>
-          <Reveal className="md:col-span-2" delay={0.15}>
-            <GlowCard className="h-full p-7">
-              <GitPullRequest className="h-6 w-6 text-[var(--c3)]" />
-              <h3 className="mt-4 font-display text-xl font-semibold">MIT open source</h3>
-              <p className="mt-2 text-sm text-white/60">Fork it for your society. Built spec-first with Kiro; specs included.</p>
-            </GlowCard>
-          </Reveal>
+        <div className="mx-auto mt-20 max-w-5xl px-4 sm:mt-28">
+          <p className="eyebrow mb-5 text-center text-white/30">Causes students are forging right now</p>
+          <Marquee>
+            {EXAMPLE_PROMPTS.map((p) => (
+              <span
+                key={p.label}
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/[0.07] bg-white/[0.025] px-4 py-2 text-sm text-white/55"
+              >
+                <span>{p.emoji}</span> {p.label}
+              </span>
+            ))}
+          </Marquee>
         </div>
       </section>
 
-      {/* ---------- How it works ---------- */}
-      <section className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            ["01", "Describe your cause", "One sentence is enough. “Winter coats for kids in Gilgit.”"],
-            ["02", "Launch a designed page", "AI writes, designs and plans. Share the link on WhatsApp."],
-            ["03", "Show the impact", "Donors get a personal, animated story of where their money went."],
-          ].map(([n, t, d], i) => (
-            <Reveal key={n} delay={i * 0.08}>
-              <div className="relative h-full rounded-3xl border border-white/10 p-7">
-                <span className="font-display text-5xl font-semibold text-white/10">{n}</span>
-                <h3 className="mt-3 font-display text-lg font-semibold">{t}</h3>
-                <p className="mt-1.5 text-sm text-white/55">{d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <FeaturedCampaigns />
-
-      {/* ---------- CTA ---------- */}
-      <section className="relative isolate mx-auto mb-20 w-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 px-6 py-16 text-center sm:px-12">
-        <Aurora className="-z-10 opacity-60" />
-        <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-5xl">Your cause deserves a campaign.</h2>
-        <p className="mx-auto mt-4 max-w-lg text-white/60">It takes about ten seconds. No sign-up, no credit card, no design skills.</p>
-        <Link
-          href="/create"
-          className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-white px-8 font-semibold text-ink transition hover:scale-[1.02] hover:bg-white/90"
-        >
-          Start forging <ArrowRight className="h-4 w-4" />
-        </Link>
-      </section>
+      <Bento />
+      <HowItWorks />
+      <Pulse />
+      <Featured />
+      <FinalCTA />
     </>
   );
 }

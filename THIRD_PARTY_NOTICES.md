@@ -15,11 +15,12 @@ ImpactForge is MIT licensed. It depends on these open-source packages, each unde
 | [lucide-react](https://github.com/lucide-icons/lucide) | ISC | Icons |
 | [canvas-confetti](https://github.com/catdad/canvas-confetti) | ISC | Celebration effect |
 | [html-to-image](https://github.com/bubkoo/html-to-image) | MIT | Share-card export |
+| [cobe](https://github.com/shuding/cobe) | MIT | WebGL globe |
 | [nanoid](https://github.com/ai/nanoid) | MIT | IDs |
 | [clsx](https://github.com/lukeed/clsx), [tailwind-merge](https://github.com/dcastil/tailwind-merge) | MIT | Class utilities |
 
 ## Design inspiration
 
-The hero backgrounds (spotlight, aurora, beams), shimmer button, number ticker, marquee and glow card in `src/components/ui/` were **written from scratch for this project**, inspired by the visual style of [Aceternity UI](https://ui.aceternity.com) and [Magic UI](https://magicui.design). No source code was copied from either library.
+The hero backgrounds (spotlight, aurora, beams, orbit), ember particles, generative cover art, shimmer button, number ticker, marquee, animated border and glow card in `src/components/ui/` were **written from scratch for this project**, inspired by the visual style of [Aceternity UI](https://ui.aceternity.com) and [Magic UI](https://magicui.design). No source code was copied from either library.
 
-Fonts: [Inter](https://rsms.me/inter/) and [Space Grotesk](https://github.com/floriankarsten/space-grotesk), both under the SIL Open Font License 1.1, served through `next/font`.
+Fonts: [Geist & Geist Mono](https://github.com/vercel/geist-font) and [Instrument Serif](https://github.com/Instrument/instrument-serif), all under the SIL Open Font License 1.1, served through `next/font`.

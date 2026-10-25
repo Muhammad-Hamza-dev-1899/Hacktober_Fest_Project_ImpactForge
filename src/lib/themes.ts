@@ -85,9 +85,6 @@ export function themeVars(palette: Palette): CSSProperties {
   } as CSSProperties;
 }
 
-/** Brand theme used outside campaign pages. */
-export const BRAND_VARS = themeVars("aurora");
-
 /**
  * Categorical data colors for charts (budget categories, fund flows).
  * Fixed order, validated for colorblind separation and >= 3:1 contrast on the
@@ -95,3 +92,14 @@ export const BRAND_VARS = themeVars("aurora");
  * consistent across every campaign so slot N always means "budget line N".
  */
 export const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"] as const;
+
+/** ImpactForge's own brand palette (molten ember), used outside campaign pages. */
+export const FORGE: PaletteTokens = {
+  name: "Forge",
+  c1: "#ff6a3d",
+  c2: "#ff3d77",
+  c3: "#ffc061",
+  accent: "#ff7a45",
+  accentText: "#1c0700",
+  glow: "rgba(255, 106, 61, 0.45)",
+};

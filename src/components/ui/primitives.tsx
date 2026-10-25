@@ -203,6 +203,7 @@ export function BlurText({
   delay = 0,
   stagger = 0.06,
   gradient = false,
+  wordClassName,
 }: {
   text: string;
   className?: string;
@@ -210,6 +211,8 @@ export function BlurText({
   stagger?: number;
   /** Gradient must be applied per word: background-clip:text doesn't reach animated children. */
   gradient?: boolean;
+  /** Applied to each word (needed for background-clip text effects). */
+  wordClassName?: string;
 }) {
   const words = text.split(" ");
   return (
@@ -218,7 +221,7 @@ export function BlurText({
         <motion.span
           key={`${w}-${i}`}
           aria-hidden
-          className={cn("inline-block", gradient && "text-gradient pb-[0.08em]")}
+          className={cn("inline-block", gradient && "text-gradient pb-[0.08em] pr-[0.04em]", wordClassName)}
           initial={{ opacity: 0, filter: "blur(10px)", y: 12 }}
           animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
           transition={{ duration: 0.6, delay: delay + i * stagger, ease: [0.16, 1, 0.3, 1] }}

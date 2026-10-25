@@ -7,7 +7,7 @@ import { Icon } from "@/components/ui/Icon";
 import { GlowCard, NumberTicker, Reveal } from "@/components/ui/primitives";
 import { SEED_CAMPAIGNS } from "@/data/campaigns";
 import { themeVars } from "@/lib/themes";
-import { formatDate, formatPKR } from "@/lib/utils";
+import { formatDate, formatPKR, unitPhrase } from "@/lib/utils";
 import { findCampaignById, useAppStore } from "@/store/useAppStore";
 
 export function Dashboard() {
@@ -26,11 +26,11 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-5 pb-24 pt-32 sm:px-6">
       <Reveal>
-        <p className="text-sm text-white/50">Dashboard</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-5xl">
-          Salaam, <span className="text-gradient">{user?.name}</span>
+        <p className="eyebrow text-[#ff8a4c]">Dashboard</p>
+        <h1 className="mt-1 text-4xl font-semibold tracking-tight sm:text-6xl">
+          Salaam, <span className="serif text-ember">{user?.name}.</span>
         </h1>
       </Reveal>
 
@@ -105,7 +105,7 @@ export function Dashboard() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{c.title}</p>
                       <p className="truncate text-xs text-white/50">
-                        {formatDate(d.createdAt)} · {d.units.count} × {d.units.label} · {d.ripple.direct} {c.beneficiaryNoun}
+                        {formatDate(d.createdAt)} · {unitPhrase(d.units.count, d.units.label)} · {d.ripple.direct} {c.beneficiaryNoun}
                       </p>
                     </div>
                     <span className="hidden font-display font-semibold sm:block">{formatPKR(d.amountPKR)}</span>

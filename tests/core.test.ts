@@ -53,6 +53,7 @@ describe("parsePrompt", () => {
   it("extracts a readable title and region", () => {
     assert.deepEqual(parsePrompt("Organize a Ramadan iftar drive for daily-wage workers in Islamabad"), {
       cause: "Organize a Ramadan iftar drive for daily-wage workers in Islamabad",
+      subject: "Ramadan iftar drive for daily-wage workers in Islamabad",
       title: "Ramadan Iftar Drive for Daily-Wage Workers",
       region: "Islamabad",
     });
@@ -150,5 +151,15 @@ describe("AI output formats", () => {
       assert.equal(fmt.type, "json_schema");
       assert.equal(fmt.schema.type, "object");
     }
+  });
+});
+
+describe("unitPhrase", () => {
+  it("pluralizes the head noun and keeps embedded quantities", async () => {
+    const { unitPhrase } = await import("../src/lib/utils");
+    assert.equal(unitPhrase(3, "1 insulated winter coat"), "3 insulated winter coats");
+    assert.equal(unitPhrase(2, "Seed & fertiliser kit for 1 acre"), "2 × Seed & fertiliser kit for 1 acre");
+    assert.equal(unitPhrase(2, "Water storage tank for a village"), "2 Water storage tanks for a village");
+    assert.equal(unitPhrase(1, "1 solar panel for a pump"), "1 solar panel for a pump");
   });
 });

@@ -66,3 +66,16 @@ export function formatDate(d: Date | string) {
 }
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * "3" + "1 insulated winter coat" → "3 insulated winter coats".
+ * Falls back to "3 × label" when the label carries its own quantity ("…for 1 child").
+ */
+export function unitPhrase(count: number, label: string) {
+  const base = label.replace(/^1\s+/, "");
+  if (count === 1) return /^1\s/.test(label) ? label : `1 × ${base}`;
+  if (/\b\d+\b/.test(base)) return `${count} × ${base}`;
+  const [head, ...rest] = base.split(/(\s(?:for|with|of|in)\s)/);
+  const plural = head.replace(/(\w+)$/, (w) => (/s$/i.test(w) ? w : /[^aeiou]y$/i.test(w) ? w.slice(0, -1) + "ies" : w + "s"));
+  return `${count} ${[plural, ...rest].join("")}`;
+}

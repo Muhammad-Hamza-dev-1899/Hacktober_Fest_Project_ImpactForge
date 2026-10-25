@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ResponsiveContainer, Sankey, Tooltip } from "recharts";
 import { Icon } from "@/components/ui/Icon";
+import { CoverArt } from "@/components/ui/CoverArt";
 import { NumberTicker } from "@/components/ui/primitives";
 import { SERIES } from "@/lib/themes";
-import { addDays, formatDate, formatPKR } from "@/lib/utils";
+import { addDays, formatDate, formatNumber, formatPKR, unitPhrase } from "@/lib/utils";
 import type { SlideProps } from "./WrappedStory";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -37,14 +38,14 @@ export function IntroSlide({ donation, campaign }: SlideProps) {
       <motion.div
         initial={{ scale: 0, rotate: -40 }}
         animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: "spring", damping: 9, stiffness: 120, delay: 0.1 }}
-        className="text-[5.5rem] leading-none"
+        transition={{ type: "spring", damping: 11, stiffness: 110, delay: 0.1 }}
+        className="mb-8 h-32 w-32 overflow-hidden rounded-full border border-white/25 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.6)]"
       >
-        {campaign.theme.emoji}
+        <CoverArt campaign={campaign} size="sm" animated={false} className="h-full w-full" />
       </motion.div>
       <Eyebrow delay={0.4}>Hey {donation.donorName}</Eyebrow>
-      <motion.h2 {...up(0.6)} className="mt-3 font-display text-[2.6rem] font-semibold leading-[1.02] tracking-tight">
-        Your {formatPKR(donation.amountPKR)} went on a journey.
+      <motion.h2 {...up(0.6)} className="mt-3 text-[2.9rem] font-semibold leading-[0.98] tracking-[-0.03em]">
+        Your {formatPKR(donation.amountPKR)} went on a <span className="serif font-normal">journey.</span>
       </motion.h2>
       <motion.p {...up(1.2)} className="mt-5 text-lg text-white/70">
         Here&apos;s exactly where it went, and who it reached in {campaign.region}.
@@ -62,14 +63,14 @@ export function AmountSlide({ donation, campaign }: SlideProps) {
   return (
     <div className="flex flex-1 flex-col justify-center">
       <Eyebrow>You gave</Eyebrow>
-      <motion.div {...up(0.15)} className="mt-2 font-display text-6xl font-semibold tracking-tight">
+      <motion.div {...up(0.15)} className="mt-2 text-[4.2rem] font-semibold leading-none tracking-[-0.04em]">
         <NumberTicker value={donation.amountPKR} prefix="PKR " duration={1.8} />
       </motion.div>
       <motion.p {...up(1.6)} className="mt-10 text-lg text-white/75">
         That became
       </motion.p>
-      <motion.p {...up(1.8)} className="font-display text-4xl font-semibold leading-tight">
-        {donation.units.count} × {donation.units.label}
+      <motion.p {...up(1.8)} className="serif text-[2.6rem] leading-[1.02]">
+        {unitPhrase(donation.units.count, donation.units.label)}
       </motion.p>
       <div className="mt-8 flex flex-wrap gap-2.5">
         {Array.from({ length: n }).map((_, i) => (
@@ -167,8 +168,8 @@ export function SankeySlide({ donation }: SlideProps) {
   return (
     <div className="flex flex-1 flex-col">
       <Eyebrow>Follow the money</Eyebrow>
-      <motion.h2 {...up(0.15)} className="mt-2 font-display text-3xl font-semibold leading-tight">
-        Every rupee, traced to the published budget.
+      <motion.h2 {...up(0.15)} className="mt-2 text-[2.2rem] font-semibold leading-[1] tracking-[-0.03em]">
+        Every rupee, <span className="serif font-normal">traced.</span>
       </motion.h2>
       <motion.div {...up(0.4)} className="mt-6 h-[320px] w-full" data-interactive>
         <ResponsiveContainer width="100%" height="100%">
@@ -188,7 +189,7 @@ export function SankeySlide({ donation }: SlideProps) {
                 if (!active || !inner) return null;
                 const label = inner.target ? `${inner.source?.name} → ${inner.target.name}` : inner.name;
                 return (
-                  <div className="rounded-xl border border-white/10 bg-[#0b0d12]/95 px-3 py-2 text-xs">
+                  <div className="rounded-xl border border-white/10 bg-[#0f0e13]/95 px-3 py-2 text-xs">
                     <p className="text-white">{label}</p>
                     <p className="text-white/60">{formatPKR(Number(inner.value ?? 0))}</p>
                   </div>
@@ -237,8 +238,11 @@ export function NetworkSlide({ donation, campaign }: SlideProps) {
   return (
     <div className="flex flex-1 flex-col">
       <Eyebrow>Who it reached</Eyebrow>
-      <motion.h2 {...up(0.15)} className="mt-2 font-display text-3xl font-semibold leading-tight">
-        You&apos;re now connected to {n} {n === 1 ? campaign.beneficiaryNoun.replace(/s$/, "") : campaign.beneficiaryNoun}.
+      <motion.h2 {...up(0.15)} className="mt-2 text-[2.2rem] font-semibold leading-[1] tracking-[-0.03em]">
+        You&apos;re now connected to{" "}
+        <span className="serif font-normal">
+          {n} {n === 1 ? campaign.beneficiaryNoun.replace(/s$/, "") : campaign.beneficiaryNoun}.
+        </span>
       </motion.h2>
       <svg
         viewBox={`0 0 ${W} ${H}`}
@@ -333,7 +337,7 @@ export function NetworkSlide({ donation, campaign }: SlideProps) {
           style={{ transformOrigin: `${you.x}px ${you.y}px` }}
         >
           <circle cx={you.x} cy={you.y} r={20} fill="white" />
-          <text x={you.x} y={you.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize={14} fontWeight={700} fill="#05060a">
+          <text x={you.x} y={you.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize={14} fontWeight={700} fill="#09080b">
             {donation.donorName[0]?.toUpperCase() ?? "Y"}
           </text>
           <text x={you.x + 30} y={you.y + 1} dominantBaseline="middle" fontSize={12} fill="white" fontWeight={600}>
@@ -350,7 +354,7 @@ export function NetworkSlide({ donation, campaign }: SlideProps) {
             transition={{ type: "spring", damping: 11, delay: 1.8 + i * 0.12 }}
             style={{ transformOrigin: `${p.x}px ${p.y}px` }}
           >
-            <circle cx={p.x} cy={p.y} r={16} fill="#0b0d12" stroke="var(--c3)" strokeWidth={2} />
+            <circle cx={p.x} cy={p.y} r={16} fill="#0f0e13" stroke="var(--c3)" strokeWidth={2} />
             <text x={p.x} y={p.y + 1} textAnchor="middle" dominantBaseline="middle" fontSize={12} fontWeight={600} fill="white">
               {p.name[0]}
             </text>
@@ -390,8 +394,8 @@ export function RippleSlide({ donation, campaign }: SlideProps) {
   return (
     <div className="flex flex-1 flex-col">
       <Eyebrow>The ripple effect</Eyebrow>
-      <motion.h2 {...up(0.15)} className="mt-2 font-display text-3xl font-semibold leading-tight">
-        One gift. Three circles of impact.
+      <motion.h2 {...up(0.15)} className="mt-2 text-[2.2rem] font-semibold leading-[1] tracking-[-0.03em]">
+        One gift. <span className="serif font-normal">Three circles.</span>
       </motion.h2>
       <div className="relative mx-auto my-8 grid h-[300px] w-[300px] place-items-center">
         {rings.map((r, i) => (
@@ -413,14 +417,14 @@ export function RippleSlide({ donation, campaign }: SlideProps) {
           animate={{ scale: [1, 3], opacity: [0.6, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, delay: 2 }}
         />
-        <span className="relative font-display text-4xl font-semibold">
+        <span className="relative text-4xl font-semibold">
           <NumberTicker value={donation.ripple.direct} delay={0.4} />
         </span>
       </div>
       <div className="space-y-3">
         {[...rings].reverse().map((r, i) => (
           <motion.div key={r.label} {...up(1.2 + i * 0.4)} className="flex items-baseline gap-3">
-            <span className="w-16 shrink-0 text-right font-display text-2xl font-semibold tabular-nums">
+            <span className="w-16 shrink-0 text-right text-2xl font-semibold tabular-nums">
               <NumberTicker value={r.value} delay={1.2 + i * 0.4} />
             </span>
             <span className="text-sm text-white/70">{r.label}</span>
@@ -440,8 +444,8 @@ export function JourneySlide({ donation }: SlideProps) {
   return (
     <div className="flex flex-1 flex-col">
       <Eyebrow>The journey</Eyebrow>
-      <motion.h2 {...up(0.15)} className="mt-2 font-display text-3xl font-semibold leading-tight">
-        From your phone to their hands.
+      <motion.h2 {...up(0.15)} className="mt-2 text-[2.2rem] font-semibold leading-[1] tracking-[-0.03em]">
+        From your phone <span className="serif font-normal">to their hands.</span>
       </motion.h2>
       <ol className="relative mt-8 space-y-5 pl-10">
         <motion.span
@@ -456,7 +460,7 @@ export function JourneySlide({ donation }: SlideProps) {
           return (
             <motion.li key={s.label} {...up(0.5 + i * 0.35)} className="relative">
               <span
-                className={`absolute -left-10 top-0.5 grid h-7 w-7 place-items-center rounded-full ${done ? "bg-white text-ink" : "border border-white/40 bg-[#07080c] text-white/70"}`}
+                className={`absolute -left-10 top-0.5 grid h-7 w-7 place-items-center rounded-full ${done ? "bg-white text-ink" : "border border-white/40 bg-[#0b0a0f] text-white/70"}`}
               >
                 {done ? <Check className="h-4 w-4" strokeWidth={3} /> : <Clock className="h-3.5 w-3.5" />}
               </span>
@@ -517,28 +521,29 @@ export function ShareSlide({ donation, campaign }: SlideProps) {
         initial={{ opacity: 0, y: 30, rotate: -3 }}
         animate={{ opacity: 1, y: 0, rotate: 0 }}
         transition={{ duration: 0.9, delay: 0.2, ease }}
-        className="relative mt-4 overflow-hidden rounded-[1.75rem] p-6 text-white"
-        style={{ background: "linear-gradient(150deg, var(--c2), color-mix(in oklab, var(--c1) 80%, black) 60%, #07080c)" }}
+        className="relative mt-4 overflow-hidden rounded-[1.75rem] border border-white/20 p-6 text-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]"
       >
-        <div className="bg-dots absolute inset-0 opacity-25" />
+        <CoverArt campaign={campaign} medallion={false} animated={false} className="absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/70" />
         <div className="relative">
           <div className="flex items-center justify-between">
-            <span className="text-4xl">{campaign.theme.emoji}</span>
-            <span className="rounded-full bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest">Impact Wrapped</span>
+            <span className="text-3xl">{campaign.theme.emoji}</span>
+            <span className="rounded-full bg-black/30 px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-widest backdrop-blur">
+              Impact Wrapped
+            </span>
           </div>
-          <p className="mt-5 text-sm text-white/75">{donation.donorName} helped</p>
-          <p className="font-display text-5xl font-semibold leading-none">
-            {donation.ripple.direct} {campaign.beneficiaryNoun}
-          </p>
+          <p className="mt-10 text-sm text-white/80">{donation.donorName} helped</p>
+          <p className="text-[3.4rem] font-semibold leading-[0.9] tracking-[-0.04em]">{donation.ripple.direct}</p>
+          <p className="serif text-[2.4rem] leading-none">{campaign.beneficiaryNoun}</p>
           <p className="mt-2 text-sm text-white/75">in {campaign.region}</p>
           <div className="mt-6 grid grid-cols-3 gap-2 text-center">
             {[
-              [formatPKR(donation.amountPKR, { compact: true }), "given"],
+              [formatNumber(donation.amountPKR), "PKR given"],
               [`Top ${donation.stats.percentile}%`, "of donors"],
               [String(donation.ripple.community), "reached"],
             ].map(([v, l]) => (
-              <div key={l} className="rounded-2xl bg-black/25 px-2 py-3">
-                <p className="font-display text-base font-semibold">{v}</p>
+              <div key={l} className="rounded-2xl border border-white/10 bg-black/30 px-2 py-3 backdrop-blur">
+                <p className="text-base font-semibold">{v}</p>
                 <p className="text-[10px] uppercase tracking-wider text-white/60">{l}</p>
               </div>
             ))}

@@ -38,7 +38,7 @@ export function ImpactPage({ donationId }: { donationId: string }) {
   if (resolved === null) return <div className="fixed inset-0 z-[60] bg-black" />;
   if (!resolved) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-4 text-center">
+      <div className="mx-auto flex min-h-[80vh] max-w-md pt-20 flex-col items-center justify-center px-4 text-center">
         <span className="text-5xl">🎁</span>
         <h1 className="mt-4 font-display text-2xl font-semibold">This Wrapped lives on another device</h1>
         <p className="mt-2 text-sm text-white/55">

@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion } from "motion/react";
 import { Briefcase, CalendarDays, Camera, Mail, MessageCircle, School, Target, type LucideIcon } from "lucide-react";
-import { useRef } from "react";
 import type { Channel, StrategyDay } from "@/lib/schema";
+import { cn } from "@/lib/utils";
 
 const CHANNEL_META: Record<Channel, { icon: LucideIcon; label: string }> = {
   instagram: { icon: Camera, label: "Instagram" },
@@ -14,60 +14,121 @@ const CHANNEL_META: Record<Channel, { icon: LucideIcon; label: string }> = {
   event: { icon: CalendarDays, label: "Event" },
 };
 
-/** Day-by-day execution plan; the glowing spine "draws" as you scroll. */
+type Phase = "Launch" | "Momentum" | "Peak" | "Final push" | "Report";
+
+const PHASE_STYLE: Record<Phase, string> = {
+  Launch: "var(--c3)",
+  Momentum: "var(--c1)",
+  Peak: "var(--c2)",
+  "Final push": "var(--c1)",
+  Report: "#34d399",
+};
+
+/** Derives the campaign arc from the plan itself, so any AI-generated plan gets phases. */
+export function phaseOf(day: StrategyDay, total: number): Phase {
+  if (day.day === total) return "Report";
+  if (day.day >= total - 2) return "Final push";
+  if (day.day <= Math.ceil(total * 0.25)) return "Launch";
+  if (day.channel === "event") return "Peak";
+  return "Momentum";
+}
+
+/** Day-by-day execution plan as a compact board, with the campaign arc on top. */
 export function StrategyTimeline({ days }: { days: StrategyDay[] }) {
-  const ref = useRef<HTMLOListElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 60%"] });
-  const scaleY = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  const total = days.length;
+  const phases = days.map((d) => phaseOf(d, total));
+  const channels = Object.entries(
+    days.reduce<Record<string, number>>((acc, d) => ({ ...acc, [d.channel]: (acc[d.channel] ?? 0) + 1 }), {}),
+  ).sort((a, b) => b[1] - a[1]);
 
   return (
-    <ol ref={ref} className="relative space-y-4 pl-12 sm:pl-16">
-      <div className="absolute bottom-2 left-[19px] top-2 w-px bg-white/10 sm:left-[27px]" aria-hidden />
-      <motion.div
-        aria-hidden
-        className="absolute bottom-2 left-[19px] top-2 w-px origin-top bg-[linear-gradient(var(--c3),var(--c1),var(--c2))] shadow-[0_0_12px_var(--glow)] sm:left-[27px]"
-        style={{ scaleY }}
-      />
-      {days.map((d, i) => {
-        const meta = CHANNEL_META[d.channel];
-        const I = meta.icon;
-        return (
-          <motion.li
-            key={d.day}
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: (i % 3) * 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
-          >
-            <span className="absolute -left-12 top-4 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-[#0b0d12] font-display text-xs font-semibold sm:-left-16 sm:h-14 sm:w-14 sm:text-sm">
-              <span className="flex flex-col items-center leading-none">
-                <span className="text-[9px] font-normal uppercase tracking-wider text-white/40">Day</span>
-                {d.day}
-              </span>
-            </span>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/20 sm:p-5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h4 className="font-display font-semibold">{d.title}</h4>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-xs text-white/70">
+    <div>
+      {/* campaign arc */}
+      <div className="card mb-6 p-5 sm:p-6">
+        <div className="flex gap-1">
+          {days.map((d, i) => (
+            <motion.div
+              key={d.day}
+              className="h-2 flex-1 origin-left rounded-full"
+              style={{ background: PHASE_STYLE[phases[i]], opacity: phases[i] === "Momentum" ? 0.45 : 1 }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.04, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            />
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-white/55">
+            {(Object.keys(PHASE_STYLE) as Phase[])
+              .filter((p) => phases.includes(p))
+              .map((p) => (
+                <span key={p} className="inline-flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full" style={{ background: PHASE_STYLE[p], opacity: p === "Momentum" ? 0.45 : 1 }} />
+                  {p}
+                </span>
+              ))}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {channels.map(([c, n]) => {
+              const I = CHANNEL_META[c as Channel].icon;
+              return (
+                <span key={c} className="inline-flex items-center gap-1 rounded-full bg-white/[0.05] px-2.5 py-1 text-[11px] text-white/60">
+                  <I className="h-3 w-3" /> {CHANNEL_META[c as Channel].label} <span className="text-white/35">×{n}</span>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {days.map((d, i) => {
+          const meta = CHANNEL_META[d.channel];
+          const I = meta.icon;
+          const phase = phases[i];
+          return (
+            <motion.li
+              key={d.day}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: (i % 3) * 0.06, ease: [0.16, 1, 0.3, 1] }}
+              className={cn(
+                "card group relative flex flex-col overflow-hidden p-5 transition hover:-translate-y-0.5 hover:border-white/15",
+              )}
+            >
+              <span
+                className="absolute inset-x-0 top-0 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${PHASE_STYLE[phase]}, transparent)` }}
+              />
+              <div className="flex items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                  <span className="serif text-3xl leading-none text-white/90">{String(d.day).padStart(2, "0")}</span>
+                  <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: PHASE_STYLE[phase] }}>
+                    {phase}
+                  </span>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-white/65">
                   <I className="h-3.5 w-3.5" /> {meta.label}
                 </span>
               </div>
-              <ul className="mt-3 space-y-1.5">
+              <h4 className="mt-4 font-semibold leading-snug">{d.title}</h4>
+              <ul className="mt-2.5 flex-1 space-y-1.5">
                 {d.tasks.map((t) => (
-                  <li key={t} className="flex gap-2 text-sm text-white/65">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--c1)]" />
+                  <li key={t} className="flex gap-2 text-[13px] leading-relaxed text-white/55">
+                    <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
                     {t}
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[var(--c1)]">
-                <Target className="h-3.5 w-3.5" /> {d.kpi}
+              <p className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-white/80">
+                <Target className="h-3 w-3 text-[var(--c1)]" /> {d.kpi}
               </p>
-            </div>
-          </motion.li>
-        );
-      })}
-    </ol>
+            </motion.li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }

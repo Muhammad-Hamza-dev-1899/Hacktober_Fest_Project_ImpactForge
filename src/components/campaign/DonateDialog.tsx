@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, Check, CreditCard, LoaderCircle, Lock, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { CoverArt } from "@/components/ui/CoverArt";
 import { Icon } from "@/components/ui/Icon";
 import { ShimmerButton } from "@/components/ui/primitives";
 import { celebrate } from "@/lib/confetti";
@@ -100,7 +101,7 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 40, opacity: 0 }}
         transition={{ type: "spring", damping: 26, stiffness: 300 }}
-        className="relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0b0d12] p-6 shadow-[0_0_80px_-20px_var(--glow)] sm:rounded-[2rem] sm:p-7"
+        className="relative max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-[2rem] border border-white/10 bg-[#0f0e13] p-6 shadow-[0_0_80px_-20px_var(--glow)] sm:rounded-[2rem] sm:p-7"
       >
         {step !== "processing" && (
           <button
@@ -115,10 +116,19 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
         <AnimatePresence mode="wait">
           {step === "amount" && (
             <motion.div key="amount" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/40">Donate to</p>
-              <h3 className="mt-1 pr-8 font-display text-xl font-semibold">
-                {campaign.theme.emoji} {campaign.title}
-              </h3>
+              <div className="flex items-center gap-3 pr-8">
+                <CoverArt
+                  campaign={campaign}
+                  size="sm"
+                  animated={false}
+                  medallion={false}
+                  className="h-12 w-12 shrink-0 rounded-2xl border border-white/10"
+                />
+                <div className="min-w-0">
+                  <p className="eyebrow text-[10px] text-white/40">Donate to</p>
+                  <h3 className="truncate text-xl font-semibold tracking-tight">{campaign.title}</h3>
+                </div>
+              </div>
               <div className="mt-6 grid grid-cols-2 gap-2">
                 {presets.map((p) => (
                   <button
@@ -131,7 +141,7 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
                         : "border-white/10 hover:border-white/25",
                     )}
                   >
-                    <span className="block font-display text-lg font-semibold">{formatPKR(p)}</span>
+                    <span className="block text-lg font-semibold">{formatPKR(p)}</span>
                   </button>
                 ))}
               </div>
@@ -141,7 +151,7 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
                   inputMode="numeric"
                   value={formatNumber(amount)}
                   onChange={(e) => setAmount(Math.min(10_000_000, Number(e.target.value.replace(/\D/g, "")) || 0))}
-                  className="w-full bg-transparent font-display text-lg outline-none"
+                  className="w-full bg-transparent text-lg outline-none"
                   aria-label="Custom amount"
                 />
               </label>
@@ -169,7 +179,7 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
               <button onClick={() => setStep("amount")} disabled={step === "processing"} className="text-xs text-white/50 hover:text-white">
                 ← {formatPKR(amount)}
               </button>
-              <h3 className="mt-2 font-display text-xl font-semibold">Payment details</h3>
+              <h3 className="mt-2 text-xl font-semibold">Payment details</h3>
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
                 <ShieldCheck className="h-3.5 w-3.5" /> Demo checkout, no real charge
               </p>
@@ -234,7 +244,7 @@ function DonatePanel({ campaign, initialAmount, onClose }: Omit<DialogProps, "op
               >
                 <Check className="h-10 w-10 text-ink" strokeWidth={3} />
               </motion.div>
-              <h3 className="mt-6 font-display text-2xl font-semibold">
+              <h3 className="mt-6 text-2xl font-semibold">
                 Thank you{donation.donorName !== "Anonymous" ? `, ${donation.donorName}` : ""}!
               </h3>
               <p className="mt-2 text-white/60">

@@ -34,12 +34,17 @@ Campus charity drives run on WhatsApp forwards and Google Forms. Organizers lose
 | 🧠 | **Campaign-in-a-Box** | Type _"I want to raise funds for winter coats"_. Two AI calls run in parallel and return a **themed landing page**: story, impact tiers (_PKR 2,500 = 1 coat_), a transparent budget, FAQs, a WhatsApp pitch and a **day-by-day launch plan** with channels and KPIs. |
 | 🎁 | **Impact Wrapped** | A cinematic, swipeable 7-slide story for every donor: a **Sankey** of where each rupee went, an animated **node graph** linking donor → campaign → beneficiaries, ripple effects, a delivery journey and an exportable share card. |
 | 💸 | **One-tap giving** | A polished donation flow that translates amounts into real outcomes, with a celebratory confetti finish. _(Payments are simulated.)_ |
+| 🎬 | **Generation Theater** | While Claude works, you watch the campaign page assemble itself: skeletons per step, then the real title, palette and cover art snap in. |
+| 🎨 | **Generative cover art** | Every campaign gets a unique poster built from its id, palette and hero style: mesh light, pattern, grain and an icon medallion. No stock photos. |
+| 🌍 | **Campus-to-valley globe** | A live WebGL globe shows donation flows from NUST, Islamabad to Gilgit, Skardu, Tharparkar, Dadu and Kech. |
 
 ## 🖼️ Screenshots
 
 | Landing | Generation Theater | Generated campaign |
 |---|---|---|
 | ![Landing](public/screenshots/home.png) | ![Generation theater](public/screenshots/theater.png) | ![Campaign](public/screenshots/campaign.png) |
+
+![Live bento: prompt-to-JSON, Sankey, plan board, Pakistan globe](public/screenshots/bento.png)
 
 | Wrapped: follow the money | Wrapped: who it reached | Wrapped: share card | Mobile |
 |---|---|---|---|
@@ -63,6 +68,13 @@ flowchart LR
   D --> W[Impact Wrapped]
 ```
 
+### Design system: "Forge"
+
+- **Molten-ember brand.** Gold, orange and magenta on a warm near-black, with drifting ember particles and film grain. It's deliberately not another teal-on-black AI template.
+- **Editorial type.** Tight Geist headlines paired with *Instrument Serif* italics on the emotional words ("into a *movement.*").
+- **Per-campaign identity.** The AI chooses 1 of 6 palettes and 4 hero styles. Pages, cover art, confetti and Wrapped slides all re-skin through CSS variables.
+- **Accessible data viz.** Chart colors come from a fixed, colorblind-validated palette and always carry text labels. All motion respects `prefers-reduced-motion`.
+
 ### Engineering decisions
 
 - **The LLM returns data, never markup.** Generation uses Anthropic structured outputs (`messages.parse` + `zodOutputFormat`). Output is then **normalized** (goal clamped, tiers sorted, budget rebalanced to exactly 100% by largest remainder, days renumbered) and **validated** by a strict Zod schema before it renders. There's no HTML injection path.
@@ -81,7 +93,8 @@ flowchart LR
 |---|---|
 | Framework | Next.js 16 (App Router, Cache Components), React 19, TypeScript (strict) |
 | Styling | Tailwind CSS v4, CSS-variable theme tokens |
-| Motion & UI | Motion (Framer Motion), custom Aceternity/Magic-UI-style components |
+| Motion & UI | Motion (Framer Motion), custom Aceternity/Magic-UI-style components, canvas ember particles, [cobe](https://github.com/shuding/cobe) WebGL globe |
+| Typography | Geist + Geist Mono, Instrument Serif italic for editorial accents |
 | Data viz | Recharts (donut, Sankey), hand-built animated SVG node graph |
 | AI | Anthropic Claude API (structured outputs), Zod |
 | State | Zustand + localStorage persistence |
