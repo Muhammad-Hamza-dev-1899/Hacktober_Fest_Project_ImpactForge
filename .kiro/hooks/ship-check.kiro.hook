@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "name": "Pre-demo ship check",
+  "description": "One click before demoing: full lint, typecheck, tests and production build.",
+  "version": "1",
+  "when": { "type": "userTriggered" },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run `npm run lint && npm run typecheck && npm test && npm run build`. Fix any failures, then summarize the result in one line."
+  }
+}

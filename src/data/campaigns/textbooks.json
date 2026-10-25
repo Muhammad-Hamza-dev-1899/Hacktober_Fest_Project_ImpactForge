@@ -1,0 +1,48 @@
+{
+  "id": "seed-textbooks",
+  "slug": "every-page-counts",
+  "prompt": "Fund textbooks and school supplies for girls in rural Balochistan",
+  "source": "seed",
+  "createdAt": "2026-10-20T09:00:00.000Z",
+  "baseRaisedPKR": 238000,
+  "baseDonors": 97,
+  "title": "Every Page Counts",
+  "tagline": "A full set of textbooks costs less than a dinner out. For a girl in Kech, it's the whole school year.",
+  "story": [
+    "In parts of Kech district, girls' schools open with teachers but without books. Families who can afford one set share it between siblings, and the girls are usually the first to go without.",
+    "Our team buys official board textbooks, stationery and school bags in bulk from Quetta and delivers them with a local teachers' association, so every girl starts the term with her own set.",
+    "PKR 3,200 equips one girl for a full year. Sponsor a student, and we'll tell you exactly which school she attends."
+  ],
+  "goalPKR": 600000,
+  "region": "Kech, Balochistan",
+  "beneficiaryNoun": "girls",
+  "impactUnits": [
+    { "amountPKR": 3200, "label": "Full textbook set for 1 girl", "icon": "book" },
+    { "amountPKR": 5500, "label": "Books, bag & stationery for a year", "icon": "graduation-cap" },
+    { "amountPKR": 40000, "label": "A classroom library shelf", "icon": "house" }
+  ],
+  "budget": [
+    { "category": "Textbooks", "percent": 61 },
+    { "category": "Bags & stationery", "percent": 22 },
+    { "category": "Delivery to schools", "percent": 13 },
+    { "category": "Payment & admin fees", "percent": 4 }
+  ],
+  "faqs": [
+    { "q": "Which schools receive the books?", "a": "Seven government girls' primary and middle schools in Kech, chosen with the district teachers' association." },
+    { "q": "Why not donate used books?", "a": "The curriculum changes often and used sets are usually incomplete. New, official sets stop girls being left behind." },
+    { "q": "Can I sponsor a specific grade?", "a": "Yes. Mention the grade in your donation note and we'll allocate your set to it." }
+  ],
+  "whatsappPitch": "📚 PKR 3,200 = a full year of textbooks for a girl in Balochistan. NUST students are delivering 200 sets this term. Be someone's first page 💛",
+  "theme": { "palette": "sunrise", "heroVariant": "aurora", "mood": "hopeful", "emoji": "📚" },
+  "days": [
+    { "day": 1, "title": "First chapter launch", "tasks": ["Team donates first 10 sets", "Share launch post in class groups"], "channel": "whatsapp", "kpi": "10 sets funded" },
+    { "day": 2, "title": "\"My first textbook\" trend", "tasks": ["Ask students to post their own first-book memory", "Use the campaign sticker"], "channel": "instagram", "kpi": "40 story posts" },
+    { "day": 3, "title": "Book-stall at the library", "tasks": ["Display a full textbook set", "QR to sponsor a girl"], "channel": "campus", "kpi": "30 sets funded" },
+    { "day": 4, "title": "Women in STEM alumni", "tasks": ["LinkedIn post tagging women alumni", "Ask for 1 sponsored set each"], "channel": "linkedin", "kpi": "25 alumni donors" },
+    { "day": 5, "title": "Teacher video", "tasks": ["Share a message from a Kech teacher", "Subtitle in English & Urdu"], "channel": "instagram", "kpi": "8,000 views" },
+    { "day": 6, "title": "Read-a-thon", "tasks": ["24-hour sponsored reading marathon", "Pledges per hour read"], "channel": "event", "kpi": "PKR 80,000 pledged" },
+    { "day": 7, "title": "Midpoint letter", "tasks": ["Email donors with progress", "Ask each to forward to one person"], "channel": "email", "kpi": "60% of goal" },
+    { "day": 8, "title": "Final push", "tasks": ["Countdown stories", "Personal follow-ups"], "channel": "whatsapp", "kpi": "Goal reached" },
+    { "day": 9, "title": "Impact Wrapped day", "tasks": ["Send every donor their Wrapped", "Share delivery photos"], "channel": "email", "kpi": "75% open rate" }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "seed-winter-coats",
+  "slug": "warmth-for-gilgit",
+  "prompt": "I want to raise funds for winter coats for children in Gilgit-Baltistan",
+  "source": "seed",
+  "createdAt": "2026-10-18T09:00:00.000Z",
+  "baseRaisedPKR": 412500,
+  "baseDonors": 143,
+  "title": "Warmth for Gilgit",
+  "tagline": "When the passes close and temperatures fall to -20°C, a coat is the difference between going to school and staying home.",
+  "story": [
+    "Every winter, thousands of children in the villages around Gilgit and Skardu walk to school in hand-me-down sweaters. When the snow comes, attendance in some government schools drops by almost half.",
+    "We're a group of NUST students partnering with a women-led tailoring cooperative in Gilgit. Every coat is stitched locally, which keeps the money in the valley, and delivered by volunteers before the first heavy snowfall.",
+    "PKR 2,500 keeps one child warm for an entire winter. Give one coat, share this page with three friends, and let's get 400 children to school this season."
+  ],
+  "goalPKR": 1000000,
+  "region": "Gilgit-Baltistan",
+  "beneficiaryNoun": "children",
+  "impactUnits": [
+    { "amountPKR": 2500, "label": "1 insulated winter coat", "icon": "shirt" },
+    { "amountPKR": 6000, "label": "Coat, gloves & boots for 1 child", "icon": "snowflake" },
+    { "amountPKR": 25000, "label": "Warm kits for a whole classroom row", "icon": "graduation-cap" }
+  ],
+  "budget": [
+    { "category": "Coats from local tailors", "percent": 68 },
+    { "category": "Gloves, caps & boots", "percent": 17 },
+    { "category": "Mountain logistics", "percent": 11 },
+    { "category": "Payment & admin fees", "percent": 4 }
+  ],
+  "faqs": [
+    { "q": "Who makes the coats?", "a": "A cooperative of 22 women tailors in Gilgit, paid fair wages per coat, so your donation supports two families at once." },
+    { "q": "How do I know a coat was delivered?", "a": "Every donor gets an Impact Wrapped report with distribution photos, school names and a delivery timeline." },
+    { "q": "Is my donation tax-deductible?", "a": "We route funds through a registered partner NGO, so receipts are available on request." }
+  ],
+  "whatsappPitch": "❄️ It's going to be -20°C in Gilgit this winter. NUST students are stitching 400 coats for kids so they can keep going to school. PKR 2,500 = 1 coat. Takes 30 seconds 👇",
+  "theme": { "palette": "glacier", "heroVariant": "spotlight", "mood": "hopeful", "emoji": "❄️" },
+  "days": [
+    { "day": 1, "title": "Soft launch with the core team", "tasks": ["Each member donates and shares with 10 close friends", "Post the founding-story reel on the society page"], "channel": "whatsapp", "kpi": "PKR 25,000 from first circle" },
+    { "day": 2, "title": "The cold-facts carousel", "tasks": ["Publish a 6-slide Instagram carousel with temperature and attendance data", "Tag 5 campus societies to reshare"], "channel": "instagram", "kpi": "50 story reshares" },
+    { "day": 3, "title": "Faculty & alumni outreach", "tasks": ["Email HoDs with a one-page campaign brief", "Post a LinkedIn update tagging the alumni network"], "channel": "linkedin", "kpi": "10 faculty donors" },
+    { "day": 4, "title": "Meet the tailors", "tasks": ["Share a 45-second video from the Gilgit cooperative", "Pin the PKR 2,500 = 1 coat message"], "channel": "instagram", "kpi": "5,000 video views" },
+    { "day": 5, "title": "Coat-drop stall at the C1 lawn", "tasks": ["Run a QR-code stall with a real coat on display", "Live counter board of coats funded"], "channel": "campus", "kpi": "60 coats funded on-site" },
+    { "day": 6, "title": "Hostel challenge", "tasks": ["Launch a hostel-vs-hostel leaderboard", "Winning hostel gets a chai night"], "channel": "whatsapp", "kpi": "8 hostels competing" },
+    { "day": 7, "title": "Midpoint impact update", "tasks": ["Share progress: coats funded, coats stitched", "Thank top donors publicly (with permission)"], "channel": "email", "kpi": "50% of goal" },
+    { "day": 8, "title": "Winter Night fundraiser", "tasks": ["Host an open-mic and kahwa evening", "Ticket price = one coat"], "channel": "event", "kpi": "150 attendees" },
+    { "day": 9, "title": "Corporate matching ask", "tasks": ["Pitch 5 NSTP startups for a 1:1 donation match", "Announce any match within 24 hours"], "channel": "linkedin", "kpi": "1 matching partner" },
+    { "day": 10, "title": "48-hour final push", "tasks": ["Countdown stories every 6 hours", "Personal DMs to everyone who viewed but didn't give"], "channel": "instagram", "kpi": "PKR 150,000 in 48h" },
+    { "day": 11, "title": "Last call on WhatsApp", "tasks": ["Send the final pitch to all class groups", "Share the live progress ring screenshot"], "channel": "whatsapp", "kpi": "Goal reached" },
+    { "day": 12, "title": "Thank-you & Impact Wrapped", "tasks": ["Send every donor their personal Impact Wrapped", "Publish the transparent budget report"], "channel": "email", "kpi": "80% donor open rate" }
+  ]
+}

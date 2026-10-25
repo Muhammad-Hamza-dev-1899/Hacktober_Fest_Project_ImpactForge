@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Seed campaigns stay valid",
+  "description": "When the schema or a curated campaign changes, make sure every fallback campaign still validates so the offline demo can't break.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/lib/schema.ts", "src/data/campaigns/*.json"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run `npm test`. If any seed campaign fails CampaignSchema validation, update the JSON files in src/data/campaigns so they match the schema without changing their meaning. Report what you changed."
+  }
+}

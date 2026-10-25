@@ -1,0 +1,50 @@
+{
+  "id": "seed-flood-relief",
+  "slug": "rebuild-after-the-water",
+  "prompt": "Raise money for families affected by floods in Sindh",
+  "source": "seed",
+  "createdAt": "2026-10-12T09:00:00.000Z",
+  "baseRaisedPKR": 1186000,
+  "baseDonors": 391,
+  "title": "Rebuild After the Water",
+  "tagline": "The water has gone down. The need hasn't. Help 300 families in Dadu get back on their feet.",
+  "story": [
+    "Months after the floods, families in Dadu district are still living in tents next to the homes they lost. Children have missed a full term of school and most families have lost their only source of income.",
+    "Our student team is working with a local relief network to deliver ration packs, clean water and seed kits so farmers can plant before the season ends. Every purchase is made in Sindh.",
+    "Relief fades from the news fast. Your PKR 4,500 feeds a family of six for two weeks. Stay with them a little longer."
+  ],
+  "goalPKR": 2000000,
+  "region": "Dadu, Sindh",
+  "beneficiaryNoun": "families",
+  "impactUnits": [
+    { "amountPKR": 4500, "label": "2-week ration pack for a family", "icon": "package" },
+    { "amountPKR": 9000, "label": "Seed & fertiliser kit for 1 acre", "icon": "leaf" },
+    { "amountPKR": 30000, "label": "Water filter for a whole settlement", "icon": "droplet" }
+  ],
+  "budget": [
+    { "category": "Food rations", "percent": 52 },
+    { "category": "Seed & farming kits", "percent": 24 },
+    { "category": "Clean water", "percent": 14 },
+    { "category": "Transport & storage", "percent": 7 },
+    { "category": "Payment & admin fees", "percent": 3 }
+  ],
+  "faqs": [
+    { "q": "Who distributes the aid?", "a": "Volunteers from a registered local relief network, accompanied by two of our student coordinators on every trip." },
+    { "q": "How are families chosen?", "a": "Using a needs survey run with village elders, prioritising widows, the elderly and households with infants." },
+    { "q": "Will I see where my money went?", "a": "Yes. You'll get an Impact Wrapped showing the exact ration batches and villages your donation reached." }
+  ],
+  "whatsappPitch": "🌊 Dadu is still underwater in every way that matters. Students are delivering ration packs to 300 families. PKR 4,500 feeds a family for 2 weeks. Please give & forward 🙏",
+  "theme": { "palette": "ember", "heroVariant": "beams", "mood": "urgent", "emoji": "🌊" },
+  "days": [
+    { "day": 1, "title": "Launch with ground photos", "tasks": ["Post on-the-ground photos with consent", "Core team shares with all class groups"], "channel": "whatsapp", "kpi": "PKR 60,000" },
+    { "day": 2, "title": "Explain the 3 tiers", "tasks": ["Carousel: ration, seed kit, water filter", "Pin to every society page"], "channel": "instagram", "kpi": "80 shares" },
+    { "day": 3, "title": "Faculty appeal", "tasks": ["Email faculty with a 1-page brief", "Ask the Rector's office for a mention"], "channel": "email", "kpi": "20 faculty donors" },
+    { "day": 4, "title": "Relief collection booth", "tasks": ["Booth at the main cafeteria", "Live PKR counter screen"], "channel": "campus", "kpi": "PKR 120,000" },
+    { "day": 5, "title": "Voices from Dadu", "tasks": ["Share a voice note from a family (translated)", "Tag journalism society"], "channel": "instagram", "kpi": "10,000 views" },
+    { "day": 6, "title": "Startup matching", "tasks": ["Pitch NSTP startups for a 1:1 match", "Announce the match"], "channel": "linkedin", "kpi": "PKR 200,000 matched" },
+    { "day": 7, "title": "Charity cricket match", "tasks": ["Faculty vs students T10", "Entry by donation"], "channel": "event", "kpi": "300 spectators" },
+    { "day": 8, "title": "First delivery report", "tasks": ["Share first batch delivery video", "Thank donors by name (with consent)"], "channel": "email", "kpi": "60% of goal" },
+    { "day": 9, "title": "Final 48 hours", "tasks": ["Countdown stories", "DM every past donor once"], "channel": "instagram", "kpi": "PKR 400,000" },
+    { "day": 10, "title": "Close & report", "tasks": ["Send Impact Wrapped to all donors", "Publish full budget breakdown"], "channel": "email", "kpi": "Goal reached" }
+  ]
+}

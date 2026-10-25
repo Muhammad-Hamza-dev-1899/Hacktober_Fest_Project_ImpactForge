@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Theme token & motion check",
+  "description": "Catch hardcoded campaign colors and motion that ignores reduced-motion preferences.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/components/**/*.tsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the edited component against .kiro/steering/design-system.md. Flag any hardcoded hex colors used for campaign theming (should be var(--c1)/var(--c2)/var(--c3)/var(--accent)), chart colors not taken from SERIES, and infinite animations that would ignore prefers-reduced-motion. Suggest minimal fixes."
+  }
+}

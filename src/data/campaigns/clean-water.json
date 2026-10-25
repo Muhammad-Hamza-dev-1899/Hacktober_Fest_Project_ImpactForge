@@ -1,0 +1,49 @@
+{
+  "id": "seed-clean-water",
+  "slug": "thar-water-wells",
+  "prompt": "Build solar water pumps for villages in Tharparkar",
+  "source": "seed",
+  "createdAt": "2026-10-15T09:00:00.000Z",
+  "baseRaisedPKR": 734000,
+  "baseDonors": 206,
+  "title": "Thar Water Wells",
+  "tagline": "Women in Thar walk 6 km a day for water. A solar pump gives that time back to a whole village.",
+  "story": [
+    "In Tharparkar's desert villages, collecting water is a full-time job, mostly done by women and girls who walk hours each day to reach brackish wells.",
+    "With an engineering society and a local solar installer, we're fitting solar-powered pumps and RO filters on existing wells and training a village committee to maintain them.",
+    "Each pump serves around 400 people for over a decade. PKR 5,000 buys a solar panel. Let's bring water to three villages before summer."
+  ],
+  "goalPKR": 1500000,
+  "region": "Tharparkar, Sindh",
+  "beneficiaryNoun": "villagers",
+  "impactUnits": [
+    { "amountPKR": 5000, "label": "1 solar panel for a pump", "icon": "sun" },
+    { "amountPKR": 12000, "label": "RO filter cartridges for a year", "icon": "droplet" },
+    { "amountPKR": 50000, "label": "Water storage tank for a village", "icon": "house" }
+  ],
+  "budget": [
+    { "category": "Solar pumps & panels", "percent": 58 },
+    { "category": "RO filtration", "percent": 21 },
+    { "category": "Installation & training", "percent": 15 },
+    { "category": "Payment & admin fees", "percent": 6 }
+  ],
+  "faqs": [
+    { "q": "Who maintains the pumps?", "a": "A trained 5-member village committee, with a 3-year service contract from the installer." },
+    { "q": "Why solar?", "a": "There's no reliable grid in most of Thar, and diesel is expensive. Solar has near-zero running cost." },
+    { "q": "How many people does one pump serve?", "a": "Around 400 people across 60-70 households." }
+  ],
+  "whatsappPitch": "💧 Women in Thar walk 6 km every day for water. Students are installing solar pumps in 3 villages. PKR 5,000 = 1 solar panel. Help us finish before summer ☀️",
+  "theme": { "palette": "aurora", "heroVariant": "orbit", "mood": "warm", "emoji": "💧" },
+  "days": [
+    { "day": 1, "title": "Launch: the 6 km walk", "tasks": ["Post a map showing the daily walk", "Core team shares in groups"], "channel": "instagram", "kpi": "PKR 50,000" },
+    { "day": 2, "title": "Engineering society tie-up", "tasks": ["Joint post with the EE society", "Explain the pump design"], "channel": "campus", "kpi": "2 society partners" },
+    { "day": 3, "title": "Alumni engineers", "tasks": ["LinkedIn: 'Sponsor a panel'", "Tag alumni working in energy"], "channel": "linkedin", "kpi": "30 panels sponsored" },
+    { "day": 4, "title": "Walk-for-water", "tasks": ["Campus 6 km sponsored walk", "Carry water cans for photos"], "channel": "event", "kpi": "200 walkers" },
+    { "day": 5, "title": "Village voices", "tasks": ["Share a story from a village committee", "Urdu + English captions"], "channel": "instagram", "kpi": "12,000 views" },
+    { "day": 6, "title": "Company CSR pitch", "tasks": ["Pitch 3 solar companies for in-kind panels", "Share any pledges"], "channel": "email", "kpi": "1 CSR partner" },
+    { "day": 7, "title": "Halfway update", "tasks": ["Progress post with ring screenshot", "Thank donors"], "channel": "whatsapp", "kpi": "50% of goal" },
+    { "day": 8, "title": "Install day livestream", "tasks": ["Livestream the first pump going live", "Clip it into a reel"], "channel": "instagram", "kpi": "1,000 live viewers" },
+    { "day": 9, "title": "Final 48h", "tasks": ["Countdown + personal DMs", "Last-call WhatsApp forward"], "channel": "whatsapp", "kpi": "Goal reached" },
+    { "day": 10, "title": "Impact Wrapped", "tasks": ["Send personal Wrapped to donors", "Publish budget report"], "channel": "email", "kpi": "80% open rate" }
+  ]
+}
